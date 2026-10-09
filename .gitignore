@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Raw simulation output (large, reproducible from seeds)
+results/raw/
