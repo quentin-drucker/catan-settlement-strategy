@@ -1,0 +1,14 @@
+[project]
+name = "catan-settlement-strategy"
+version = "0.1.0"
+description = "Catan-inspired settlement draft: board model, CPU strategies, fairness simulations and a Pygame demo."
+authors = [{ name = "Quentin Drucker" }, { name = "Emmett Manning" }]
+requires-python = ">=3.10"
+dependencies = ["matplotlib>=3.7", "pygame>=2.5"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
