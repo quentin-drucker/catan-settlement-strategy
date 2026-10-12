@@ -31,6 +31,23 @@
   touches (from Issue #1). `player.payoff(board)` adds up a player's settlements, and
   `game.payoffs()` returns the total for every player.
 
+## See it in the terminal
+
+```
+python main.py explore --seed 42
+```
+
+Type a command and press Enter; the board redraws after each one.
+
+- `A 22` places a settlement for player A on vertex 22. It shows as `A22`, and its
+  neighbours change to `x16`, `x17`, `x28` (blocked).
+- `B 17` is then rejected, with the reason shown under the board.
+- `22` inspects a vertex; `v` switches labels between IDs and values.
+- `r` removes all settlements; `q` quits.
+
+The list under the board shows each player's settlements and payoff. Turn order is not
+enforced yet, so you choose which player places.
+
 ## How to test it yourself
 
 Run these from the repository root.

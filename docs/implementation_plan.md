@@ -16,6 +16,7 @@ and the commands to test it yourself.
 | 4 | #4 Simulations + fairness analysis | Not started |
 | 5 | #5 Pygame interactive mode | Not started |
 | 6 | #6 Blocking-aware CPU (optional) | Not started |
+| – | Terminal board view (backup to the Pygame window) | **Done** – `src/text_view.py`, `python main.py explore` (13 tests) |
 | – | README, docs, `main.py` CLI | Grows with each step |
 
 ## Step 1 – Board (done)
