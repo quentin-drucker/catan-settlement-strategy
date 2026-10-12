@@ -21,9 +21,9 @@ from src.board import HIGH_PROBABILITY_NUMBERS, generate_board
 from src.game import Game
 
 # ANSI colour codes. Colour is optional: every state also has a text marker.
-PLAYER_COLORS = {"A": "1;91", "B": "1;94", "C": "1;92", "D": "1;93"}
+PLAYER_COLORS = {"A": "1;91", "B": "1;94", "C": "1;92", "D": "1;95"}
 BLOCKED_COLOR = "90"
-HIGH_NUMBER_COLOR = "1;91"
+HIGH_NUMBER_COLOR = "1;93"  # gold; must differ from every player colour
 
 HELP = (
     "Commands:  A 22 = place player A on vertex 22  |  22 = inspect vertex 22\n"
