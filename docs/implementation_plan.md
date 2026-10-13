@@ -11,11 +11,12 @@ and the commands to test it yourself.
 | Step | Issue | Status |
 |---|---|---|
 | 1 | #1 Board representation | **Done** – `src/board.py`, `tests/test_board.py` (24 tests passing) |
-| 2 | #2 Placement rules + scoring | Not started |
+| 2 | #2 Placement rules + scoring | **Done** – `src/game.py`, `src/player.py`, `tests/test_game.py` (39 tests; 63 in total) |
 | 3 | #3 Greedy CPU + draft | Not started |
 | 4 | #4 Simulations + fairness analysis | Not started |
 | 5 | #5 Pygame interactive mode | Not started |
 | 6 | #6 Blocking-aware CPU (optional) | Not started |
+| – | Terminal board view (backup to the Pygame window) | **Done** – `src/text_view.py`, `python main.py explore` (13 tests) |
 | – | README, docs, `main.py` CLI | Grows with each step |
 
 ## Step 1 – Board (done)
@@ -32,20 +33,23 @@ and the commands to test it yourself.
   separated mode needs ~7 attempts (~0.8 ms per board). Rejection sampling also gives
   every valid board equal probability, which keeps Experiment 3 unbiased.
 
-## Step 2 – Placement rules and scoring (`src/game.py`, `src/player.py`)
+## Step 2 – Placement rules and scoring (done)
 
-- `Player` dataclass: `name`, `strategy` (`None` = human), `settlements`, `payoff(board)`.
+- `Player` dataclass: `name`, `settlements`, `payoff(board)`.
 - `Game` placement state: `owner` (vertex → player), `blocked` set (occupied vertices
-  plus their neighbours), `is_legal(v)`, `legal_vertices()`, `place(v)`.
-- `place()` raises `IllegalPlacementError` for occupied, adjacent, out-of-range, or
-  post-game placements. It never accepts an illegal placement without raising.
-- Tests: blocking of vertex + neighbours, rejection of each illegal case, payoff sums.
+  plus their neighbours), `is_legal(v)`, `legal_vertices()`, `place(player, v)`,
+  `payoffs()`.
+- `place()` raises `IllegalPlacementError` for occupied, adjacent or invalid vertices,
+  says which rule was broken, and leaves the game unchanged.
+- `place()` takes the player's name and does not check turn order yet; that is Step 3.
 
 ## Step 3 – Greedy CPU and draft (`src/strategies.py`, `src/game.py`)
 
 - `draft_order(players, "snake" | "standard")` → `ABCDDCBA` / `ABCDABCD`.
 - `Strategy` base class with `choose(game) -> vertex`; `GreedyStrategy(rng)` picks a
   max-value legal vertex and breaks ties with `rng.choice` over sorted candidates.
+- Add a `strategy` field to `Player` (`None` = human).
+- Turn tracking in `Game`: `place()` also rejects out-of-turn and post-game placements.
 - `Game.play_turn()` asks the current player's strategy, then validates through `place()`.
   `Game.play()` runs to completion. `Move` records (turn, player, vertex, value).
 - `main.py play --seed N --draft snake --board random` prints the turn log + payoffs.

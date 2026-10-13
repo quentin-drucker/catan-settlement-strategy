@@ -30,6 +30,22 @@
     forever. About 14% of random boards already qualify, so it takes ~7 tries.
   - The same `(seed, mode)` always gives the same board.
 
+## See it in the terminal
+
+```
+python main.py explore --seed 42
+```
+
+This draws the board as a text honeycomb: tile numbers in the middle of each hex and
+the 54 vertex IDs at the corners. Type a command and press Enter; the board redraws.
+
+- `22` inspects vertex 22: the tiles it touches, how its value adds up, and its neighbours.
+- `v` switches the corner labels between vertex IDs and vertex values.
+- `q` quits.
+
+Add `--board separated` for a board with no 6 or 8 next to another 6 or 8. Leave out
+`--seed` for a random board.
+
 ## How to test it yourself
 
 Run these from the repository root.
