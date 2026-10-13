@@ -172,7 +172,7 @@ def test_separated_mode_has_no_adjacent_6_and_8():
 
 
 def test_random_mode_sometimes_has_adjacent_6_and_8():
-    assert any(generate_board(seed).has_adjacent_high_numbers() for seed in range(200))
+    assert any(generate_board(seed, "random").has_adjacent_high_numbers() for seed in range(200))
 
 
 def test_separated_generation_fails_cleanly_when_attempts_exhausted():

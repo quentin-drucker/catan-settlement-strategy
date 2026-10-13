@@ -178,11 +178,11 @@ class Board:
         )
 
 
-def generate_board(seed: int | None = None, mode: str = "random", max_attempts: int = 1000) -> Board:
+def generate_board(seed: int | None = None, mode: str = "separated", max_attempts: int = 1000) -> Board:
     """Generate a board with the standard tokens and one desert on random hexes.
 
-    ``mode="random"`` shuffles all 19 tiles freely. ``mode="separated"`` uses
-    rejection sampling: reshuffle until no 6/8 tile is adjacent to another
+    ``mode="random"`` shuffles all 19 tiles freely. ``mode="separated"`` (the
+    default) uses rejection sampling: reshuffle until no 6/8 tile is adjacent to another
     6/8 tile, giving up with ``BoardGenerationError`` after ``max_attempts``.
     The result depends only on ``seed`` and ``mode``, so a board can always be
     regenerated from them.

@@ -26,7 +26,7 @@ and the commands to test it yourself.
   72 edges. Vertex IDs 0–53 in reading order, identical on every board.
 - `Hex` / `Vertex` frozen dataclasses; `Board(numbers)` builds the graph;
   `board.vertex_value(v)` = sum of adjacent tile dice weights (desert = 0).
-- `generate_board(seed, mode)` with `"random"` and `"separated"` (rejection sampling,
+- `generate_board(seed, mode)` with `"separated"` (default) and `"random"` (rejection sampling,
   bounded by `max_attempts`, raises `BoardGenerationError`). The board depends only on
   `(seed, mode)`.
 - Measured: ~14% of random shuffles already satisfy the 6/8 separation rule, so

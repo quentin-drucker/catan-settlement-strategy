@@ -34,7 +34,7 @@
 ## See it in the terminal
 
 ```
-python main.py explore --seed 42
+python main.py explore --seed 42 --board random
 ```
 
 Type a command and press Enter; the board redraws after each one.
@@ -63,7 +63,7 @@ You should see `39 passed`. To run everything, use `python -m pytest` (`63 passe
 **Place settlements and watch the state change:**
 
 ```
-python -c "from src.board import generate_board; from src.game import Game; g = Game(generate_board(seed=42)); print('legal before:', len(g.legal_vertices())); print('A places on 22, value', g.place('A', 22)); print('blocked now:', sorted(g.blocked)); print('legal after:', len(g.legal_vertices())); print('B places on 0, value', g.place('B', 0)); print('A places on 53, value', g.place('A', 53)); print('settlements:', {n: p.settlements for n, p in g.players.items()}); print('payoffs:', g.payoffs())"
+python -c "from src.board import generate_board; from src.game import Game; g = Game(generate_board(seed=42, mode='random')); print('legal before:', len(g.legal_vertices())); print('A places on 22, value', g.place('A', 22)); print('blocked now:', sorted(g.blocked)); print('legal after:', len(g.legal_vertices())); print('B places on 0, value', g.place('B', 0)); print('A places on 53, value', g.place('A', 53)); print('settlements:', {n: p.settlements for n, p in g.players.items()}); print('payoffs:', g.payoffs())"
 ```
 
 Expected output:
@@ -88,7 +88,7 @@ leaves 50 legal. A's payoff is 13 + 3 = 16.
 Occupied vertex:
 
 ```
-python -c "from src.board import generate_board; from src.game import Game; g = Game(generate_board(seed=42)); g.place('A', 22); g.place('B', 22)"
+python -c "from src.board import generate_board; from src.game import Game; g = Game(generate_board(seed=42, mode='random')); g.place('A', 22); g.place('B', 22)"
 ```
 
 Ends with: `IllegalPlacementError: vertex 22 is already occupied by player A`
@@ -96,7 +96,7 @@ Ends with: `IllegalPlacementError: vertex 22 is already occupied by player A`
 Vertex next to a settlement:
 
 ```
-python -c "from src.board import generate_board; from src.game import Game; g = Game(generate_board(seed=42)); g.place('A', 22); g.place('B', 17)"
+python -c "from src.board import generate_board; from src.game import Game; g = Game(generate_board(seed=42, mode='random')); g.place('A', 22); g.place('B', 17)"
 ```
 
 Ends with: `IllegalPlacementError: vertex 17 is adjacent to player A's settlement on vertex 22`
@@ -104,7 +104,7 @@ Ends with: `IllegalPlacementError: vertex 17 is adjacent to player A's settlemen
 Not a vertex:
 
 ```
-python -c "from src.board import generate_board; from src.game import Game; g = Game(generate_board(seed=42)); g.place('A', 99)"
+python -c "from src.board import generate_board; from src.game import Game; g = Game(generate_board(seed=42, mode='random')); g.place('A', 99)"
 ```
 
 Ends with: `IllegalPlacementError: 99 is not a vertex ID (0-53)`

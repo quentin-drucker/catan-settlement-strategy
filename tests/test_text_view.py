@@ -11,7 +11,7 @@ from src.text_view import apply_command, describe_vertex, render, status
 
 @pytest.fixture
 def game():
-    return Game(generate_board(seed=42))
+    return Game(generate_board(seed=42, mode="random"))
 
 
 def labels_in(text):
