@@ -1,7 +1,7 @@
 """Command-line entry point.
 
 Usage:
-    python main.py explore [--seed N] [--board random|separated]
+    python main.py explore [--seed N] [--board separated|random]
 """
 
 import argparse
@@ -19,7 +19,7 @@ def main() -> None:
         "explore", help="show a board in the terminal and place settlements by hand"
     )
     explore_parser.add_argument("--seed", type=int, default=None, help="board seed (default: random)")
-    explore_parser.add_argument("--board", choices=BOARD_MODES, default="random", help="board-generation mode")
+    explore_parser.add_argument("--board", choices=BOARD_MODES, default="separated", help="board-generation mode (default: separated)")
 
     args = parser.parse_args()
     seed = args.seed if args.seed is not None else random.randrange(1_000_000)

@@ -33,7 +33,7 @@
 ## See it in the terminal
 
 ```
-python main.py explore --seed 42
+python main.py explore --seed 42 --board random
 ```
 
 This draws the board as a text honeycomb: tile numbers in the middle of each hex and
@@ -43,8 +43,8 @@ the 54 vertex IDs at the corners. Type a command and press Enter; the board redr
 - `v` switches the corner labels between vertex IDs and vertex values.
 - `q` quits.
 
-Add `--board separated` for a board with no 6 or 8 next to another 6 or 8. Leave out
-`--seed` for a random board.
+Boards are generated in `separated` mode by default (no 6 or 8 next to another 6 or 8).
+Add `--board random` to allow 6s and 8s to touch. Leave out `--seed` for a random board.
 
 ## How to test it yourself
 
@@ -61,7 +61,7 @@ You should see `24 passed`.
 **Count hexes, vertices and edges:**
 
 ```
-python -c "from src.board import generate_board; b = generate_board(seed=42); print(len(b.hexes), 'hexes,', len(b.vertices), 'vertices,', len(b.edges()), 'edges')"
+python -c "from src.board import generate_board; b = generate_board(seed=42, mode='random'); print(len(b.hexes), 'hexes,', len(b.vertices), 'vertices,', len(b.edges()), 'edges')"
 ```
 
 Expected output: `19 hexes, 54 vertices, 72 edges`
@@ -69,7 +69,7 @@ Expected output: `19 hexes, 54 vertices, 72 edges`
 **Print the board as text** (`--` is the desert):
 
 ```
-python -c "from src.board import generate_board; b = generate_board(seed=42); [print(' ' * 3 * abs(r) + '  '.join(str(h.number or '--').rjust(4) for h in b.hexes if h.r == r)) for r in range(-2, 3)]"
+python -c "from src.board import generate_board; b = generate_board(seed=42, mode='random'); [print(' ' * 3 * abs(r) + '  '.join(str(h.number or '--').rjust(4) for h in b.hexes if h.r == r)) for r in range(-2, 3)]"
 ```
 
 Expected output for seed 42:
@@ -88,7 +88,7 @@ again and you get the same board.
 **Inspect one vertex** (its hexes, their numbers, its value and its neighbours):
 
 ```
-python -c "from src.board import generate_board; b = generate_board(seed=42); v = b.vertices[22]; print('vertex', v.id, 'touches hexes', v.hexes, 'with numbers', [b.hexes[h].number for h in v.hexes], '-> value', b.vertex_value(v.id), '| neighbors', v.neighbors)"
+python -c "from src.board import generate_board; b = generate_board(seed=42, mode='random'); v = b.vertices[22]; print('vertex', v.id, 'touches hexes', v.hexes, 'with numbers', [b.hexes[h].number for h in v.hexes], '-> value', b.vertex_value(v.id), '| neighbors', v.neighbors)"
 ```
 
 Expected output: `vertex 22 touches hexes (3, 7, 8) with numbers [8, 5, 9] -> value 13 | neighbors (16, 17, 28)`.

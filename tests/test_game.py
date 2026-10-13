@@ -10,7 +10,7 @@ from src.game import PLAYER_NAMES, Game, IllegalPlacementError
 
 @pytest.fixture
 def game():
-    return Game(generate_board(seed=42))
+    return Game(generate_board(seed=42, mode="random"))
 
 
 def snapshot(game):
