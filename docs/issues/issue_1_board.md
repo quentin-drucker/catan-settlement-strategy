@@ -39,7 +39,7 @@ python main.py explore --seed 42 --board random
 This draws the board as a text honeycomb: tile numbers in the middle of each hex and
 the 54 vertex IDs at the corners. Type a command and press Enter; the board redraws.
 
-- `22` inspects vertex 22: the tiles it touches, how its value adds up, and its neighbours.
+- `i 22` inspects vertex 22: the tiles it touches, how its value adds up, and its neighbours.
 - `v` switches the corner labels between vertex IDs and vertex values.
 - `q` quits.
 

@@ -1,6 +1,9 @@
 # Issue #2: Settlement Placement Rules and Probability-Based Scoring
 
-**Status: Done.** 39 new tests pass (63 in total with Issue #1).
+**Status: Done.** Its tests are the first section of `tests/test_game.py`.
+
+> **Updated for Issue #3:** placements now follow the draft order (A B C D D C B A), so the
+> examples below place for A, then B, then C. See `issue_3_greedy_cpu_and_draft.md`.
 
 ## What was done
 
@@ -37,16 +40,14 @@
 python main.py explore --seed 42 --board random
 ```
 
-Type a command and press Enter; the board redraws after each one.
+All four seats are human here. Type a command and press Enter; the board redraws after
+each one. The panel shows whose turn it is.
 
-- `A 22` places a settlement for player A on vertex 22. It shows as `A22`, and its
-  neighbours change to `x16`, `x17`, `x28` (blocked).
-- `B 17` is then rejected, with the reason shown under the board.
-- `22` inspects a vertex; `v` switches labels between IDs and values.
-- `r` removes all settlements; `q` quits.
-
-The list under the board shows each player's settlements and payoff. Turn order is not
-enforced yet, so you choose which player places.
+- `22` places a settlement on vertex 22 for the player whose turn it is (A first). It shows
+  as `A22`, and its neighbours change to `x16`, `x17`, `x28` (blocked).
+- `17` on B's turn is then rejected, with the reason shown under the board.
+- `i 22` inspects a vertex; `v` switches labels between IDs and values.
+- `r` restarts on the same board; `q` quits.
 
 ## How to test it yourself
 
@@ -58,12 +59,12 @@ Run these from the repository root.
 python -m pytest tests/test_game.py -v
 ```
 
-You should see `39 passed`. To run everything, use `python -m pytest` (`63 passed`).
+Everything should pass. To run the whole project's tests, use `python -m pytest`.
 
 **Place settlements and watch the state change:**
 
 ```
-python -c "from src.board import generate_board; from src.game import Game; g = Game(generate_board(seed=42, mode='random')); print('legal before:', len(g.legal_vertices())); print('A places on 22, value', g.place('A', 22)); print('blocked now:', sorted(g.blocked)); print('legal after:', len(g.legal_vertices())); print('B places on 0, value', g.place('B', 0)); print('A places on 53, value', g.place('A', 53)); print('settlements:', {n: p.settlements for n, p in g.players.items()}); print('payoffs:', g.payoffs())"
+python -c "from src.board import generate_board; from src.game import Game; g = Game(generate_board(seed=42, mode='random')); print('legal before:', len(g.legal_vertices())); print('A places on 22, value', g.place('A', 22)); print('blocked now:', sorted(g.blocked)); print('legal after:', len(g.legal_vertices())); print('B places on 0, value', g.place('B', 0)); print('C places on 53, value', g.place('C', 53)); print('settlements:', {n: p.settlements for n, p in g.players.items()}); print('payoffs:', g.payoffs())"
 ```
 
 Expected output:
@@ -74,13 +75,13 @@ A places on 22, value 13
 blocked now: [16, 17, 22, 28]
 legal after: 50
 B places on 0, value 3
-A places on 53, value 3
-settlements: {'A': [22, 53], 'B': [0], 'C': [], 'D': []}
-payoffs: {'A': 16, 'B': 3, 'C': 0, 'D': 0}
+C places on 53, value 3
+settlements: {'A': [22], 'B': [0], 'C': [53], 'D': []}
+payoffs: {'A': 13, 'B': 3, 'C': 3, 'D': 0}
 ```
 
 Vertex 22 has neighbours 16, 17 and 28, so placing there blocks four vertices and
-leaves 50 legal. A's payoff is 13 + 3 = 16.
+leaves 50 legal. Each payoff is the value of that player's one settlement so far.
 
 **Try the three kinds of illegal move.** Each command should end with an
 `IllegalPlacementError`; that error is the correct result.
@@ -123,12 +124,9 @@ Ends with: `IllegalPlacementError: 99 is not a vertex ID (0-53)`
 - A rejected placement leaves the game completely unchanged
 - Payoffs equal the sum of settlement values, including a hand-built board where the
   expected numbers were worked out by hand (10 + 12 + 6 → 9, and 11 + desert + 3 → 4)
-- On 20 random boards, random legal placements are made until no legal vertex remains;
-  no two settlements are ever adjacent and every settlement has exactly one owner
+- On 20 boards × both draft orders, random legal games are played to the end; no two
+  settlements are ever adjacent and every settlement has exactly one owner
 
 ## Not included
 
-- **Turn order.** `place` takes the player's name and does not check whose turn it is.
-  Snake and standard draft order, the eight-placement limit and two settlements per
-  player belong to Issue #3.
-- **CPU players.** Also Issue #3.
+Turn order, the eight-placement limit and CPU players were added in Issue #3.

@@ -12,12 +12,12 @@ and the commands to test it yourself.
 |---|---|---|
 | 1 | #1 Board representation | **Done** – `src/board.py`, `tests/test_board.py` (24 tests passing) |
 | 2 | #2 Placement rules + scoring | **Done** – `src/game.py`, `src/player.py`, `tests/test_game.py` (39 tests; 63 in total) |
-| 3 | #3 Greedy CPU + draft | Not started |
+| 3 | #3 Greedy CPU + draft | **Done** – `src/strategies.py`, `src/game.py`, `python main.py play` (123 tests in total) |
 | 4 | #4 Simulations + fairness analysis | Not started |
 | 5 | #5 Pygame interactive mode | Not started |
 | 6 | #6 Blocking-aware CPU (optional) | Not started |
-| – | Terminal board view (backup to the Pygame window) | **Done** – `src/text_view.py`, `python main.py explore` (13 tests) |
-| – | README, docs, `main.py` CLI | Grows with each step |
+| – | Terminal board view (backup to the Pygame window) | **Done** – `src/text_view.py`; `play --step`, `play --human A`, `explore` |
+| – | README, docs, `main.py` CLI | README written (install, usage, layout); grows with each step |
 
 ## Step 1 – Board (done)
 
@@ -43,23 +43,27 @@ and the commands to test it yourself.
   says which rule was broken, and leaves the game unchanged.
 - `place()` takes the player's name and does not check turn order yet; that is Step 3.
 
-## Step 3 – Greedy CPU and draft (`src/strategies.py`, `src/game.py`)
+## Step 3 – Greedy CPU and draft (done)
 
 - `draft_order(players, "snake" | "standard")` → `ABCDDCBA` / `ABCDABCD`.
 - `Strategy` base class with `choose(game) -> vertex`; `GreedyStrategy(rng)` picks a
-  max-value legal vertex and breaks ties with `rng.choice` over sorted candidates.
-- Add a `strategy` field to `Player` (`None` = human).
-- Turn tracking in `Game`: `place()` also rejects out-of-turn and post-game placements.
-- `Game.play_turn()` asks the current player's strategy, then validates through `place()`.
-  `Game.play()` runs to completion. `Move` records (turn, player, vertex, value).
-- `main.py play --seed N --draft snake --board random` prints the turn log + payoffs.
-- Tests: 8 placements, 2 settlements each, CPUs never illegal, same seed ⇒ same game.
+  max-value legal vertex and breaks ties with `rng.choice` over the (sorted) legal list.
+- `Player.strategy` (`None` = human). `Game(board, strategies, draft)`.
+- Turn tracking: `current_player`, `is_over`; `place()` rejects out-of-turn and post-game
+  placements. `Move(turn, player, vertex, value)` log in `game.moves`.
+- `play_turn()` asks the current CPU and validates through `place()`; `play()` runs to the
+  end; `winners()` lists everyone tied for first.
+- `new_game(seed, board_mode, draft, humans)`: board from `generate_board(seed, mode)`,
+  greedy CPUs sharing `random.Random(seed)` for tie-breaks. Same seed ⇒ same board under
+  both drafts, and an identical game on replay.
+- `main.py play` prints the board, turn log and payoffs; `--step` advances with Enter;
+  `--human A` lets you play a seat. Inspect in the terminal view is now `i 22`.
+- Measured: ~1.4 ms per full game, so 10,000 games take about 15 s.
 
 ## Step 4 – Simulations and fairness (`src/simulation.py`, `src/analysis.py`)
 
-- `run_game(seed, board_mode, draft)`: board from `generate_board(seed, mode)`, and
-  tie-breaks from a separate `random.Random(seed)`. The same seed therefore gives the
-  **same board under both draft formats** (Experiment 2 isolation).
+- Each game comes from `new_game(seed, board_mode, draft)` (Step 3), so the same seed gives
+  the **same board under both draft formats** (Experiment 2 isolation).
 - `simulate(n, base_seed, ...)`: game *i* uses seed `base_seed + i`, so any row can be
   replayed with `main.py play --seed`.
 - CSV, one row per (game, player): `sim_id, seed, board_mode, draft, player, strategy,
@@ -87,9 +91,25 @@ and the commands to test it yourself.
   every blocked vertex, which would over-count options nobody would take).
 - Compare against greedy in each seat on identical seeds.
 
+## Final deliverables (presentation)
+
+Charts and demos to build once the simulations exist (Step 4 onward):
+
+- **Board heatmap** (requested): the hex board coloured by how often each vertex is
+  taken, overall and as the first pick. The most visual slide.
+- **Mean payoff by seat A–D, snake vs standard,** side by side with error bars. The
+  headline answer to the research question.
+- **First vs second pick value by seat.** Explains the snake trade-off (A gets the best
+  first pick but the worst second pick).
+- **Fairness gap table:** snake/standard × random/separated boards.
+- **Payoff spread per seat** (box plot): balanced averages can still hide luck.
+- **Live demo:** human vs three greedy CPUs in the Pygame window (Step 5).
+- **Optional:** blocking CPU vs greedy, payoff gain by seat (Step 6).
+- **Docs:** README (install, run, reproduce), one-page background, architecture diagram.
+
 ## Decisions needing team approval
 
-1. **Branch:** work is on local branch `core-implementation` (not pushed).
+1. **Default board mode:** `separated` (decided by Emmett, PR #9).
 2. **Desert placement:** random hex (like real Catan), not always the centre.
 3. **Tie-break seeding:** tie-break RNG seeded from the game seed, independent of the board.
 4. **Win rate with ties:** split credit (`1/k` to each of `k` tied players).
