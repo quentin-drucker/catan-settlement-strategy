@@ -5,8 +5,8 @@ import re
 import pytest
 
 from src.board import generate_board
-from src.game import Game
-from src.text_view import apply_command, describe_vertex, render, status
+from src.game import Game, new_game
+from src.text_view import apply_command, describe_vertex, game_log, render, status
 
 
 @pytest.fixture
@@ -57,13 +57,43 @@ def test_color_only_adds_escape_codes(game):
     assert re.sub(r"\033\[[0-9;]*m", "", colored) == render(game)
 
 
-def test_status_lists_settlements_and_payoffs(game):
+def test_status_shows_turn_settlements_and_payoffs(game):
+    assert "Draft: snake (A B C D D C B A)    Turn 1 of 8: player A (human)" in status(game)
     game.place("A", 22)
-    game.place("A", 53)
+    game.place("B", 53)
     text = status(game)
-    assert "Player A: vertex 22 (13) + vertex 53 (3)  ->  payoff 16" in text
-    assert "Player B: no settlements  ->  payoff 0" in text
+    assert "Turn 3 of 8: player C (human)" in text
+    assert "Player A (human): vertex 22 (13)  ->  payoff 13" in text
+    assert "Player C (human): no settlements  ->  payoff 0" in text
     assert f"Legal vertices left: {len(game.legal_vertices())} of 54" in text
+
+
+def test_status_lists_both_settlements_and_the_winner_after_a_cpu_game():
+    game = new_game(42, "random")
+    game.play()
+    text = status(game)
+    assert "GAME OVER. Winner" in text or "GAME OVER. Tie for first" in text
+    a = game.players["A"]
+    v1, v2 = a.settlements
+    b = game.board
+    assert (
+        f"Player A (greedy CPU): vertex {v1} ({b.vertex_value(v1)}) + vertex {v2} ({b.vertex_value(v2)})"
+        f"  ->  payoff {a.payoff(b)}"
+    ) in text
+
+
+def test_game_log_lists_moves_payoffs_and_result():
+    game = new_game(42, "random")
+    game.play()
+    lines = game_log(game).splitlines()
+    assert lines[:8] == [
+        f"Turn {m.turn}: Player {m.player} chooses vertex {m.vertex} (value {m.value})" for m in game.moves
+    ]
+    assert "Final payoffs:" in lines
+    for name, payoff in game.payoffs().items():
+        assert any(ln.startswith(f"  {name}: {payoff:>2}") for ln in lines)
+    winners = game.winners()
+    assert lines[-1] == (f"Winner: player {winners[0]}" if len(winners) == 1 else "Tie for first: players " + ", ".join(winners))
 
 
 def test_describe_vertex(game):
@@ -75,18 +105,21 @@ def test_describe_vertex(game):
     assert "not a vertex ID" in describe_vertex(game, 99)
 
 
-def test_apply_command_places_and_reports(game):
-    message = apply_command(game, "a 22")
+@pytest.mark.parametrize("command", ["22", "a 22"])
+def test_apply_command_places_for_the_human_whose_turn_it_is(game, command):
+    message = apply_command(game, command)
     assert game.owner == {22: "A"}
-    assert "Player A placed on vertex 22; neighbours 16, 17, 28 are now blocked." in message
+    assert message.startswith("Turn 1: Player A chooses vertex 22 (value 13).")
+    assert "neighbours: 16, 17, 28   state: occupied by player A" in message
 
 
 @pytest.mark.parametrize(
     "command, expected",
     [
-        ("b 22", "REJECTED: vertex 22 is already occupied by player A"),
-        ("b 17", "REJECTED: vertex 17 is adjacent to player A's settlement on vertex 22"),
-        ("b 99", "REJECTED: 99 is not a vertex ID (0-53)"),
+        ("22", "REJECTED: vertex 22 is already occupied by player A"),
+        ("17", "REJECTED: vertex 17 is adjacent to player A's settlement on vertex 22"),
+        ("99", "REJECTED: 99 is not a vertex ID (0-53)"),
+        ("c 5", "REJECTED: it is player B's turn, not player C's"),
         ("e 5", "REJECTED: unknown player 'E'"),
     ],
 )
@@ -96,8 +129,31 @@ def test_apply_command_reports_rejections_without_changing_the_game(game, comman
     assert game.owner == {22: "A"}
 
 
+def test_enter_lets_the_cpu_move_and_waits_for_humans():
+    game = new_game(42, "random", humans="B")
+    message = apply_command(game, "")  # A is a greedy CPU
+    assert message.startswith("Turn 1: Player A chooses vertex")
+    assert len(game.moves) == 1
+    assert apply_command(game, "") == "It is player B's turn (human): type a vertex number to place."
+    assert len(game.moves) == 1
+
+
+def test_human_cannot_move_for_a_cpu():
+    game = new_game(42, "random", humans="B")
+    assert apply_command(game, "22") == "REJECTED: player A is a CPU; press Enter to let it move."
+    assert game.moves == []
+
+
+def test_commands_after_the_game_is_over():
+    game = new_game(42, "random")
+    game.play()
+    assert apply_command(game, "").startswith("The game is over.")
+    assert apply_command(game, "5").startswith("The game is over.")
+    assert apply_command(game, "i 22") == describe_vertex(game, 22)
+
+
 def test_apply_command_inspects_and_handles_nonsense(game):
-    assert apply_command(game, "22") == describe_vertex(game, 22)
+    assert apply_command(game, "i 22") == describe_vertex(game, 22)
     assert apply_command(game, "hello there friend").startswith("Did not understand")
-    assert apply_command(game, "").startswith("Did not understand")
+    assert apply_command(game, "a b").startswith("Did not understand")
     assert game.owner == {}

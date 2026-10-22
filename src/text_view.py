@@ -1,8 +1,9 @@
 """Plain-text view of the board for the terminal.
 
 This is a backup / learning view, separate from the planned Pygame window.
-``render`` and ``status`` are pure functions (game in, string out) so they can
-be tested; ``explore`` is the interactive loop around them.
+``render``, ``status``, ``game_log`` and ``apply_command`` are pure functions
+(game in, string out) so they can be tested; ``interactive`` is the loop
+around them.
 
 Layout
 ------
@@ -16,9 +17,10 @@ from __future__ import annotations
 
 import os
 import sys
+from collections.abc import Callable
 
-from src.board import HIGH_PROBABILITY_NUMBERS, generate_board
-from src.game import Game
+from src.board import HIGH_PROBABILITY_NUMBERS
+from src.game import Game, Move
 
 # ANSI colour codes. Colour is optional: every state also has a text marker.
 PLAYER_COLORS = {"A": "1;91", "B": "1;94", "C": "1;92", "D": "1;95"}
@@ -26,8 +28,8 @@ BLOCKED_COLOR = "90"
 HIGH_NUMBER_COLOR = "1;93"  # gold; must differ from every player colour
 
 HELP = (
-    "Commands:  A 22 = place player A on vertex 22  |  22 = inspect vertex 22\n"
-    "           v = switch labels (IDs / values)    |  r = remove all settlements  |  q = quit"
+    "Commands:  Enter = let the CPU move  |  22 = place on vertex 22 (your turn)  |  i 22 = inspect vertex 22\n"
+    "           v = switch labels (IDs / values)  |  r = restart on the same board  |  q = quit"
 )
 
 
@@ -87,17 +89,39 @@ def render(game: Game, labels: str = "ids", color: bool = False) -> str:
     return "\n".join("".join(row).rstrip() for row in grid)
 
 
+def _kind(game: Game, name: str) -> str:
+    strategy = game.players[name].strategy
+    return "human" if strategy is None else f"{strategy.name} CPU"
+
+
+def _result(game: Game) -> str:
+    winners = game.winners()
+    if len(winners) == 1:
+        return f"Winner: player {winners[0]}"
+    return "Tie for first: players " + ", ".join(winners)
+
+
 def status(game: Game) -> str:
-    """Legend plus each player's settlements and payoff."""
+    """Whose turn it is, a legend, and each player's settlements and payoff."""
     board = game.board
+    draft = f"Draft: {game.draft} ({' '.join(game.order)})"
+    if game.is_over:
+        turn = f"GAME OVER. {_result(game)}"
+    else:
+        name = game.current_player.name
+        turn = f"Turn {len(game.moves) + 1} of {len(game.order)}: player {name} ({_kind(game, name)})"
     lines = [
+        f"{draft}    {turn}",
+        "",
         "Legend:   22 = legal    x22 = blocked    A22 = player A's settlement    -- = desert",
         "Weights:  2,12 = 1   3,11 = 2   4,10 = 3   5,9 = 4   6,8 = 5   desert = 0",
         "",
     ]
     for name, player in game.players.items():
         placed = " + ".join(f"vertex {v} ({board.vertex_value(v)})" for v in player.settlements)
-        lines.append(f"Player {name}: {placed or 'no settlements'}  ->  payoff {player.payoff(board)}")
+        lines.append(
+            f"Player {name} ({_kind(game, name)}): {placed or 'no settlements'}  ->  payoff {player.payoff(board)}"
+        )
     lines.append(f"Legal vertices left: {len(game.legal_vertices())} of {len(board.vertices)}")
     return "\n".join(lines)
 
@@ -123,36 +147,77 @@ def describe_vertex(game: Game, vertex: int) -> str:
     )
 
 
+def describe_move(move: Move) -> str:
+    """One line for a completed move."""
+    return f"Turn {move.turn}: Player {move.player} chooses vertex {move.vertex} (value {move.value})"
+
+
+def game_log(game: Game) -> str:
+    """Every move so far, then the payoffs and the result if the game is over."""
+    lines = [describe_move(m) for m in game.moves]
+    if game.is_over:
+        lines += ["", "Final payoffs:"]
+        lines += [
+            f"  {name}: {player.payoff(game.board):>2}   (vertices "
+            + " + ".join(f"{v} = {game.board.vertex_value(v)}" for v in player.settlements)
+            + ")"
+            for name, player in game.players.items()
+        ]
+        lines += ["", _result(game)]
+    return "\n".join(lines)
+
+
 def apply_command(game: Game, command: str) -> str:
-    """Run one typed command against the game and return the message to show."""
+    """Run one typed command against the game and return the message to show.
+
+    ``""`` (Enter) lets a CPU move, ``"22"`` places for the human whose turn
+    it is, ``"a 22"`` places for a named human player, ``"i 22"`` inspects.
+    """
     parts = command.replace(",", " ").split()
+    if len(parts) == 2 and parts[0] == "i" and parts[1].isdigit():
+        return describe_vertex(game, int(parts[1]))
+    if game.is_over and len(parts) <= 2:
+        return "The game is over.  r = play again on the same board,  q = quit."
+
+    player = game.current_player
+    if not parts:
+        if player.strategy is None:
+            return f"It is player {player.name}'s turn (human): type a vertex number to place."
+        move = game.play_turn()
+        return describe_move(move) + ".\n" + describe_vertex(game, move.vertex)
+
     if len(parts) == 1 and parts[0].isdigit():
-        return describe_vertex(game, int(parts[0]))
-    if len(parts) == 2 and parts[1].isdigit():
-        player, vertex = parts[0].upper(), int(parts[1])
-        try:
-            game.place(player, vertex)
-        except ValueError as error:  # includes IllegalPlacementError
-            return f"REJECTED: {error}"
-        blocked = ", ".join(map(str, game.board.vertices[vertex].neighbors))
-        return f"Player {player} placed on vertex {vertex}; neighbours {blocked} are now blocked.\n" + describe_vertex(
-            game, vertex
-        )
-    return "Did not understand that.\n" + HELP
+        name, vertex = player.name, int(parts[0])
+    elif len(parts) == 2 and parts[1].isdigit():
+        name, vertex = parts[0].upper(), int(parts[1])
+    else:
+        return "Did not understand that.\n" + HELP
+
+    if name in game.players and game.players[name].strategy is not None:
+        return f"REJECTED: player {name} is a CPU; press Enter to let it move."
+    try:
+        game.place(name, vertex)
+    except ValueError as error:  # includes IllegalPlacementError
+        return f"REJECTED: {error}"
+    return describe_move(game.moves[-1]) + ".\n" + describe_vertex(game, vertex)
 
 
-def explore(seed: int, mode: str) -> None:
-    """Interactive loop: redraw the board after every command."""
-    game = Game(generate_board(seed, mode))
-    interactive = sys.stdout.isatty()
-    color = interactive and "NO_COLOR" not in os.environ
+def interactive(make_game: Callable[[], Game], title: str) -> None:
+    """Interactive loop: redraw the board after every command.
+
+    ``make_game`` builds a fresh game; it is called again on restart, so a
+    seeded factory replays the identical game.
+    """
+    game = make_game()
+    tty = sys.stdout.isatty()
+    color = tty and "NO_COLOR" not in os.environ
     if color:
         os.system("")  # switches on ANSI colour support in the classic Windows console
     labels, message = "ids", HELP
     while True:
-        if interactive:
+        if tty:
             os.system("cls" if os.name == "nt" else "clear")
-        print(f"Board seed {seed}, mode '{mode}'. Vertex labels show: {labels}.\n")
+        print(f"{title}  Vertex labels show: {labels}.\n")
         print(render(game, labels, color))
         print()
         print(status(game))
@@ -168,7 +233,7 @@ def explore(seed: int, mode: str) -> None:
             labels = "values" if labels == "ids" else "ids"
             message = f"Vertex labels now show {labels}."
         elif command == "r":
-            game = Game(game.board)
-            message = "All settlements removed (same board)."
+            game = make_game()
+            message = "Restarted on the same board."
         else:
             message = apply_command(game, command)
