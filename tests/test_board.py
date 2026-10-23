@@ -1,4 +1,11 @@
-"""Tests for board geometry, adjacency graph, scoring weights and generation (Issue #1)."""
+"""Tests for the board (Issue #1).
+
+Covers:
+- geometry: 19 hexes, 54 vertices, 72 edges, rows of 3-4-5-4-3
+- adjacency: hex <-> vertex links, vertex neighbours, shared corners
+- scoring: dice weights, vertex values, desert = 0
+- generation: token counts, seeds, "separated" vs "random" modes, bad input
+"""
 
 from collections import Counter
 
@@ -15,24 +22,32 @@ from src.board import (
 
 @pytest.fixture
 def board():
+    """Any generated board works for geometry checks (geometry is the same on every board)."""
     return generate_board(seed=1)
 
 
+# --- Scoring weights -----------------------------------------------------------
+
+
 def test_dice_weights_are_ways_out_of_36():
+    # Count every two-dice total from all 36 rolls; 7 has no tile, so drop it.
     ways = Counter(a + b for a in range(1, 7) for b in range(1, 7))
     del ways[7]
     assert DICE_WEIGHTS == dict(ways)
 
 
+# --- Geometry ----------------------------------------------------------------
+
+
 def test_board_has_19_hexes_in_3_4_5_4_3_rows(board):
     assert len(board.hexes) == 19
-    rows = Counter(h.r for h in board.hexes)
+    rows = Counter(h.r for h in board.hexes)  # r = row
     assert [rows[r] for r in sorted(rows)] == [3, 4, 5, 4, 3]
 
 
 def test_board_has_54_unique_vertices(board):
     assert len(board.vertices) == 54
-    assert len({(v.x, v.y) for v in board.vertices}) == 54
+    assert len({(v.x, v.y) for v in board.vertices}) == 54  # no two vertices at the same spot
     assert [v.id for v in board.vertices] == list(range(54))
 
 
@@ -46,7 +61,11 @@ def test_each_hex_has_six_distinct_corners(board):
         assert len(set(h.corners)) == 6
 
 
+# --- Adjacency ----------------------------------------------------------------
+
+
 def test_hex_and_vertex_references_agree(board):
+    # hex lists vertex <-> vertex lists hex, in both directions.
     for h in board.hexes:
         for v in h.corners:
             assert h.id in board.vertices[v].hexes
@@ -63,6 +82,7 @@ def test_vertices_touch_one_to_three_hexes(board):
 
 
 def test_vertex_adjacency_is_symmetric_and_irreflexive(board):
+    # Symmetric: if A is next to B, B is next to A. Irreflexive: nothing is its own neighbour.
     for v in board.vertices:
         assert v.id not in v.neighbors
         for n in v.neighbors:
@@ -84,6 +104,7 @@ def test_neighbouring_vertices_are_one_hex_side_apart(board):
 
 
 def test_neighbouring_vertices_are_consecutive_corners_of_a_shared_hex(board):
+    # Every edge should be one side of some hex both vertices belong to.
     for a, b in board.edges():
         shared = set(board.vertices[a].hexes) & set(board.vertices[b].hexes)
         assert any(
@@ -94,6 +115,7 @@ def test_neighbouring_vertices_are_consecutive_corners_of_a_shared_hex(board):
 
 
 def test_adjacent_hexes_share_exactly_two_corners(board):
+    # Touching hexes share one edge = 2 corners; non-touching hexes share none.
     for h in board.hexes:
         assert 3 <= len(h.neighbors) <= 6
         for n in h.neighbors:
@@ -110,6 +132,7 @@ def test_centre_hex_has_six_neighbours(board):
 
 
 def test_geometry_is_identical_across_boards():
+    # Only numbers change between seeds; positions and links stay the same.
     a, b = generate_board(seed=1), generate_board(seed=2)
     assert [(v.x, v.y, v.hexes, v.neighbors) for v in a.vertices] == [
         (v.x, v.y, v.hexes, v.neighbors) for v in b.vertices
@@ -117,8 +140,12 @@ def test_geometry_is_identical_across_boards():
     assert [h.corners for h in a.hexes] == [h.corners for h in b.hexes]
 
 
+# --- Tokens and scoring ---------------------------------------------------------
+
+
 @pytest.mark.parametrize("mode", ["random", "separated"])
 def test_number_distribution_preserved(mode):
+    # Every board: exactly one desert + the 18 standard tokens.
     for seed in range(50):
         numbers = generate_board(seed, mode).numbers
         assert numbers.count(None) == 1
@@ -129,13 +156,15 @@ def test_desert_contributes_zero_weight():
     board = generate_board(seed=3)
     desert = next(h for h in board.hexes if h.number is None)
     assert desert.weight == 0
+    # Each desert corner's value = only its other (non-desert) tiles.
     for v in desert.corners:
         expected = sum(board.hexes[h].weight for h in board.vertices[v].hexes if h != desert.id)
         assert board.vertex_value(v) == expected
 
 
 def test_manual_vertex_scoring():
-    # Put 6, 9 and 3 on the three hexes around one interior vertex.
+    # Hand-checked examples on one interior vertex (touches 3 hexes).
+    # First blank its 3 hexes so the example numbers can be dropped in.
     board = Board([*NUMBER_TOKENS, None])
     v = next(v for v in board.vertices if len(v.hexes) == 3)
     numbers = board.numbers
@@ -157,12 +186,16 @@ def test_vertex_values_sum_tile_weights(board):
         assert board.vertex_value(v.id) == sum(board.hexes[h].weight for h in v.hexes)
 
 
+# --- Generation -------------------------------------------------------------------
+
+
 def test_same_seed_same_board_different_seed_differs():
     assert generate_board(42).numbers == generate_board(42).numbers
     assert generate_board(42).numbers != generate_board(43).numbers
 
 
 def test_separated_mode_has_no_adjacent_6_and_8():
+    # Checked two ways: the board's own helper, and directly hex by hex.
     for seed in range(200):
         board = generate_board(seed, "separated")
         assert not board.has_adjacent_high_numbers()
@@ -172,6 +205,7 @@ def test_separated_mode_has_no_adjacent_6_and_8():
 
 
 def test_random_mode_sometimes_has_adjacent_6_and_8():
+    # Makes sure "random" really is unconstrained (otherwise the two modes would be the same).
     assert any(generate_board(seed, "random").has_adjacent_high_numbers() for seed in range(200))
 
 
@@ -183,6 +217,7 @@ def test_separated_generation_fails_cleanly_when_attempts_exhausted():
 
 
 def test_invalid_inputs_rejected():
+    # Unknown mode, 18 tiles instead of 19, and a 7 token are all rejected.
     with pytest.raises(ValueError):
         generate_board(0, "bogus")
     with pytest.raises(ValueError):

@@ -56,7 +56,7 @@ Run these from the repository root.
 python -m pytest tests/test_board.py -v
 ```
 
-You should see `24 passed`.
+Expected: `24 passed`.
 
 **Count hexes, vertices and edges:**
 
@@ -82,8 +82,7 @@ Expected output for seed 42:
          6     2     4
 ```
 
-Change `seed=42` to another number and you get a different board. Run the same seed
-again and you get the same board.
+Different seed -> different board. Same seed again -> same board.
 
 **Inspect one vertex** (its hexes, their numbers, its value and its neighbours):
 

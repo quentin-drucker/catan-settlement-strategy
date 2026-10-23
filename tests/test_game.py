@@ -1,4 +1,11 @@
-"""Tests for placement rules and payoffs (Issue #2) and the draft controller (Issue #3)."""
+"""Tests for the game controller.
+
+- Issue #2 section: placement rules (blocking, occupied, adjacent, bad IDs) + payoffs
+- Issue #3 section: draft order, turns, game end, full CPU games, reproducibility
+
+Most tests use the seed-42 *random* board, whose numbers are known: e.g. vertex 22
+touches 8, 5, 9 -> value 13, and its neighbours are 16, 17, 28.
+"""
 
 import random
 
@@ -18,10 +25,12 @@ from src.game import (
 
 @pytest.fixture
 def game():
+    """All-human game (moves made by hand) on the seed-42 random board."""
     return Game(generate_board(seed=42, mode="random"))
 
 
 def snapshot(game):
+    """Copy of all game state, to check a rejected move changed nothing."""
     return (
         dict(game.owner),
         set(game.blocked),
@@ -99,6 +108,7 @@ def test_adjacent_placement_rejected_for_another_player(game):
 
 
 def test_adjacent_placement_rejected_for_the_same_player(game):
+    # The distance rule applies to a player's own settlements too.
     advance_to_d(game)
     game.place("D", 22)
     before = snapshot(game)
@@ -109,6 +119,7 @@ def test_adjacent_placement_rejected_for_the_same_player(game):
 
 
 def test_vertex_two_steps_away_is_still_legal(game):
+    # Only direct neighbours get blocked; neighbours-of-neighbours stay open.
     game.place("A", 22)
     two_away = {
         m for n in game.board.vertices[22].neighbors for m in game.board.vertices[n].neighbors
@@ -132,6 +143,7 @@ def test_unknown_player_rejected(game):
 
 
 def test_payoff_is_sum_of_settlement_values(game):
+    # Snake turns A B C D D: D gets two settlements in a row.
     board = game.board
     for player, vertex in zip("ABCD", (22, 0, 53, 31)):
         game.place(player, vertex)
@@ -165,6 +177,7 @@ def test_manual_payoff_on_hand_built_board():
 @pytest.mark.parametrize("seed", range(20))
 @pytest.mark.parametrize("draft", DRAFT_FORMATS)
 def test_random_legal_games_keep_every_rule(seed, draft):
+    # Random legal games (20 seeds x 2 drafts), then check the rules held the whole way.
     game = Game(generate_board(seed), draft=draft)
     board = game.board
     play_randomly(game, random.Random(seed))
@@ -194,6 +207,7 @@ def test_draft_orders():
 
 @pytest.mark.parametrize("draft, expected", [("snake", "ABCDDCBA"), ("standard", "ABCDABCD")])
 def test_turns_follow_the_draft_order(draft, expected):
+    # Always take the lowest legal vertex; just checking whose turn comes when.
     game = Game(generate_board(7), draft=draft)
     seen = []
     while not game.is_over:
@@ -210,7 +224,7 @@ def test_out_of_turn_placement_rejected(game):
     game.place("A", 22)
     with pytest.raises(IllegalPlacementError, match="it is player B's turn, not player A's"):
         game.place("A", 0)
-    assert snapshot(game)[0] == {22: "A"}
+    assert snapshot(game)[0] == {22: "A"}  # only A's first settlement went through
 
 
 def test_game_ends_after_eight_placements_with_two_each(game):
@@ -218,6 +232,7 @@ def test_game_ends_after_eight_placements_with_two_each(game):
     assert game.is_over and game.current_player is None
     assert len(game.moves) == 8
     assert all(len(p.settlements) == 2 for p in game.players.values())
+    # Any move after the end is rejected and changes nothing.
     before = snapshot(game)
     with pytest.raises(IllegalPlacementError, match="the game is over"):
         game.place("A", game.legal_vertices()[0])
@@ -238,12 +253,14 @@ def test_play_turn_refuses_to_move_for_a_human():
 @pytest.mark.parametrize("draft", DRAFT_FORMATS)
 @pytest.mark.parametrize("board_mode", ["separated", "random"])
 def test_full_cpu_games_are_complete_and_consistent(draft, board_mode):
+    # 50 seeds x 2 drafts x 2 board modes of all-CPU games.
     for seed in range(50):
         game = new_game(seed, board_mode, draft)
         moves = game.play()
         assert game.is_over and len(moves) == 8
         assert [m.player for m in moves] == draft_order(PLAYER_NAMES, draft)
         assert all(len(p.settlements) == 2 for p in game.players.values())
+        # Payoffs agree with the move log, and each logged value matches the board.
         for name, payoff in game.payoffs().items():
             assert payoff == sum(m.value for m in moves if m.player == name)
         assert all(m.value == game.board.vertex_value(m.vertex) for m in moves)
@@ -252,10 +269,12 @@ def test_full_cpu_games_are_complete_and_consistent(draft, board_mode):
 def test_same_seed_gives_identical_game():
     for seed in range(20):
         assert new_game(seed).play() == new_game(seed).play()
+    # Sanity check: different seeds don't all produce the same game.
     assert len({tuple(new_game(seed).play()) for seed in range(20)}) > 1
 
 
 def test_same_seed_gives_same_board_under_both_drafts():
+    # Needed so snake vs standard can be compared on identical boards (Issue #4).
     for seed in range(20):
         snake, standard = new_game(seed, draft="snake"), new_game(seed, draft="standard")
         assert snake.board.numbers == standard.board.numbers
@@ -269,10 +288,12 @@ def test_new_game_board_mode_and_seats():
 
 
 def test_winners_reports_single_winner_and_ties(game):
+    # Vertices 12 and 28 are both worth 12 and not adjacent -> A and B tie.
     for player, vertex in zip("ABC", (12, 28, 0)):
         game.place(player, vertex)
     assert game.payoffs() == {"A": 12, "B": 12, "C": 3, "D": 0}
     assert game.winners() == ["A", "B"]
+    # D's two picks (12 + 3) then put D alone on top.
     game.place("D", 31)
     game.place("D", 2)
     assert game.payoffs()["D"] == 15

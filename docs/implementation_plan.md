@@ -57,7 +57,7 @@ and the commands to test it yourself.
   greedy CPUs sharing `random.Random(seed)` for tie-breaks. Same seed ⇒ same board under
   both drafts, and an identical game on replay.
 - `main.py play` prints the board, turn log and payoffs; `--step` advances with Enter;
-  `--human A` lets you play a seat. Inspect in the terminal view is now `i 22`.
+  `--human A` = a person plays seat A. Inspect in the terminal view is now `i 22`.
 - Measured: ~1.4 ms per full game, so 10,000 games take about 15 s.
 
 ## Step 4 – Simulations and fairness (`src/simulation.py`, `src/analysis.py`)

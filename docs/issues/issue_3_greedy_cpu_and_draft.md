@@ -84,7 +84,7 @@ Things to notice:
 - The turns go A B C D **D** C B A: D picks twice in a row.
 - Each pick is the best value still legal at that moment. The values only go down
   (12, 12, 12, 10, 9, 8, 8, 8) because good spots get taken or blocked.
-- Run the same command again: you get the identical game.
+- Same command again -> identical game.
 
 ### 2. Same board, standard draft
 
@@ -103,10 +103,10 @@ Expected result:
 Winner: player A
 ```
 
-The board is the same, and the first four picks are the same. In the standard order,
-A takes the 9 on turn 5 that D got under snake, so the spread grows from 1 point
-(snake: 20, 20, 20, 19) to 3 points (standard: 21 … 18). That is one game, not
-evidence. Issue #4 repeats this over thousands of boards.
+- Same board, same first four picks.
+- Standard order -> A takes the 9 on turn 5 (D got it under snake).
+- Spread (best minus worst): snake 20/20/20/19 -> 1 point; standard 21 ... 18 -> 3 points.
+- Only one game, so not evidence. Issue #4 repeats this over thousands of boards.
 
 ### 3. Step through a game move by move
 
@@ -114,10 +114,12 @@ evidence. Issue #4 repeats this over thousands of boards.
 python main.py play --seed 42 --step
 ```
 
-The board is shown before the first move. **Press Enter** to let the next CPU move; the
-board redraws with its new settlement (`A22`, …) and the spots it blocked (`x16`, …). The
-panel shows whose turn it is, for example `Turn 5 of 8: player D (greedy CPU)`, and
-`GAME OVER` with the winner at the end. `q` quits.
+- The board shows up before the first move.
+- **Enter** -> next CPU move. The board redraws with the new settlement (`A22`, ...) and the
+  spots it blocked (`x16`, ...).
+- The panel shows whose turn it is, e.g. `Turn 5 of 8: player D (greedy CPU)`, and
+  `GAME OVER` + the winner at the end.
+- `q` quits.
 
 ### 4. Play a seat yourself against three CPUs
 
@@ -125,12 +127,12 @@ panel shows whose turn it is, for example `Turn 5 of 8: player D (greedy CPU)`, 
 python main.py play --seed 42 --human A
 ```
 
-You are player A, so it starts on your turn.
+Seat A is human, so the game starts on the human's turn.
 
 - **Type a vertex number** and press Enter to place there. Try `22`, one of four spots
-  worth 12, the most on this board. Type `v` first if you want to see every spot's value.
+  worth 12, the most on this board. Type `v` first to see every spot's value.
 - **Press Enter** to let each CPU move.
-- An illegal choice is rejected with the reason, and nothing changes. For example, on your
+- An illegal choice is rejected with the reason, and nothing changes. For example, on A's
   second turn try a spot marked `x`.
 - `i 22` inspects a spot, `r` restarts the same game, and `q` quits.
 
@@ -173,8 +175,8 @@ python main.py play --human E
 - The terminal view: Enter moves a CPU, a number places for a human, a human cannot move
   for a CPU, and the game-over messages and final log are right
 
-I also checked that the tests catch real bugs. Making greedy pick the *worst* spot made 3
-tests fail, and removing the turn check made 2 tests fail.
+Check that the tests catch real bugs: making greedy pick the *worst* spot -> 3 tests fail;
+removing the turn check -> 2 tests fail.
 
 ## Not included
 
