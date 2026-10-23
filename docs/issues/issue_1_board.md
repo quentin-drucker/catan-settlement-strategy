@@ -39,7 +39,7 @@ python main.py explore --seed 42 --board random
 This draws the board as a text honeycomb: tile numbers in the middle of each hex and
 the 54 vertex IDs at the corners. Type a command and press Enter; the board redraws.
 
-- `22` inspects vertex 22: the tiles it touches, how its value adds up, and its neighbours.
+- `i 22` inspects vertex 22: the tiles it touches, how its value adds up, and its neighbours.
 - `v` switches the corner labels between vertex IDs and vertex values.
 - `q` quits.
 
@@ -56,7 +56,7 @@ Run these from the repository root.
 python -m pytest tests/test_board.py -v
 ```
 
-You should see `24 passed`.
+Expected: `24 passed`.
 
 **Count hexes, vertices and edges:**
 
@@ -82,8 +82,7 @@ Expected output for seed 42:
          6     2     4
 ```
 
-Change `seed=42` to another number and you get a different board. Run the same seed
-again and you get the same board.
+Different seed -> different board. Same seed again -> same board.
 
 **Inspect one vertex** (its hexes, their numbers, its value and its neighbours):
 

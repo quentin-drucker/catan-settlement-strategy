@@ -1,29 +1,61 @@
-"""Command-line entry point.
+"""Command-line entry point: ``python main.py <command> [options]``.
 
-Usage:
-    python main.py explore [--seed N] [--board separated|random]
+Commands:
+- ``play``: four greedy CPUs play one game -> prints the final board, turn log, payoffs.
+  - ``--step``: show the board after every move instead (Enter = next move)
+  - ``--human A``: play seat A in the terminal (``--human AC`` = two seats)
+- ``explore``: same terminal view, but all four seats are human.
+
+Options for both:
+    --seed N                     same seed -> same board and game (default: random, printed)
+    --board separated|random     separated (default) = no 6/8 next to another 6/8
+    --draft snake|standard       snake (default) = A B C D D C B A
 """
 
 import argparse
 import random
+import sys
 
 from src.board import BOARD_MODES
-from src.text_view import explore
+from src.game import DRAFT_FORMATS, PLAYER_NAMES, new_game
+from src.text_view import game_log, interactive, render
 
 
 def main() -> None:
+    """Read the command-line options, then run the chosen command."""
     parser = argparse.ArgumentParser(description="Catan settlement-strategy project.")
+    # Options shared by both commands (added to each through parents=[common]).
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--seed", type=int, default=None, help="game seed (default: random)")
+    common.add_argument("--board", choices=BOARD_MODES, default="separated", help="board-generation mode (default: separated)")
+    common.add_argument("--draft", choices=DRAFT_FORMATS, default="snake", help="draft order (default: snake)")
     commands = parser.add_subparsers(dest="command", required=True)
 
-    explore_parser = commands.add_parser(
-        "explore", help="show a board in the terminal and place settlements by hand"
-    )
-    explore_parser.add_argument("--seed", type=int, default=None, help="board seed (default: random)")
-    explore_parser.add_argument("--board", choices=BOARD_MODES, default="separated", help="board-generation mode (default: separated)")
+    play_parser = commands.add_parser("play", parents=[common], help="play a full game with greedy CPUs")
+    play_parser.add_argument("--step", action="store_true", help="show the board after every move")
+    play_parser.add_argument("--human", type=str.upper, default="", metavar="SEATS", help="seats you play, e.g. A or AC")
+    commands.add_parser("explore", parents=[common], help="place every settlement by hand (all seats human)")
 
     args = parser.parse_args()
+    # No seed given -> pick one, so it can be printed and the game replayed later.
     seed = args.seed if args.seed is not None else random.randrange(1_000_000)
-    explore(seed, args.board)
+    humans = "".join(PLAYER_NAMES) if args.command == "explore" else args.human
+    if not set(humans) <= set(PLAYER_NAMES):
+        parser.error(f"--human must only contain seats {', '.join(PLAYER_NAMES)}")
+
+    title = f"Seed {seed}, board '{args.board}', draft '{args.draft}'."
+    # Anything interactive -> terminal loop. The lambda rebuilds the same game on restart.
+    if args.command == "explore" or args.step or humans:
+        interactive(lambda: new_game(seed, args.board, args.draft, humans), title)
+        return
+
+    # Plain "play": run the whole game, then print it once.
+    game = new_game(seed, args.board, args.draft)
+    game.play()
+    print(title + "\n")
+    print(render(game, color=sys.stdout.isatty()))
+    print()
+    print(game_log(game))
 
 
 if __name__ == "__main__":

@@ -1,23 +1,30 @@
-"""A player and the settlements they own."""
+"""A player: their name, who makes their moves (CPU or human), and their settlements."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 from src.board import Board
+
+# Only needed for type hints. Importing it for real would be circular
+# (strategies -> game -> player -> strategies).
+if TYPE_CHECKING:
+    from src.strategies import Strategy
 
 
 @dataclass
 class Player:
-    """One participant in the draft.
+    """One seat in the draft (A, B, C or D).
 
-    ``settlements`` holds the vertex IDs of this player's settlements in the
-    order they were placed.
+    - ``strategy``: the CPU strategy that picks this player's moves; ``None`` = a human picks
+    - ``settlements``: vertex IDs this player owns, in the order they were placed
     """
 
     name: str
-    settlements: list[int] = field(default_factory=list)
+    strategy: Strategy | None = None
+    settlements: list[int] = field(default_factory=list)  # new empty list per player
 
     def payoff(self, board: Board) -> int:
-        """Total utility: the sum of the values of this player's settlements."""
+        """Utility = sum of the values of this player's settlements."""
         return sum(board.vertex_value(v) for v in self.settlements)
