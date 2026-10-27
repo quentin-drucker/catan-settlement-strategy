@@ -5,7 +5,7 @@
   - background: Catan's opening, draft orders, the game-theory framing
   - in summary: what the model does and doesn't include, side by side
   - scoring: dice-weight table drawn as Catan number tokens with pips
-  - experiments, limits, team and course, where the code lives
+  - additional information: setups, seeds, tie-breaks, limits
   Sources: proposal, docs/experiments.md, src/board.py (dice weights).
 -->
 <html lang="en">
@@ -134,7 +134,7 @@
     <h2>Additional Information</h2>
     <ul>
       <li>Four different setups are run, snake draft and standard draft on both 'true random' and 'traditional separated' board types.</li>
-      <li>Each game "I" uses the seed "I", meaning that our results are replicable and board layout is generally similar, with differences coming from having to split up 6s and 8s for 'traditional separated' boards.</li>
+      <li>Each game "i" uses the seed "i", meaning that our results are replicable and the snake and standard drafts are played on exactly the same boards, so the draft order is the only difference between them.</li>
       <li>Greedy players will break ties between same-value spots at random, but that random number is calculated from the seed so this is repeatable as well.</li>
       <li>Strategy is limited by the greedy nature of CPU players, they will not strategically block other players as an actual Catan player might.</li>
     </ul>
