@@ -11,7 +11,9 @@
    4. Components         reusable pieces, one class each (+ "--modifier" variations):
                          .skip-link, .lede, .byline, .ornament, .button, .panel,
                          .stats/.stat, .token-strip, .token, .figure, .data-table,
-                         .card-grid/.card, .badge, .note, .command, .board
+                         .card-grid/.card, .badge, .note, .command, .board,
+                         game pages: .controls/.field, .status, .board-pair,
+                         .board-panel, .move-log, .player-chip
    5. Page tweaks        small page-specific adjustments (kept short).
 
    Rule of thumb: need a new look? Add a component in section 4 that uses the
@@ -45,6 +47,7 @@
   --color-standard: #eb6834;
   --color-snake-text: #1f62b3;   /* darker steps for text, so labels pass 4.5:1 */
   --color-standard-text: #a33c15;
+  --color-error: #a33c15;        /* rejected move / load failure messages (5.5:1) */
 
   /* Catan number tokens */
   --color-token: #86630E;        /* wheat gold: token ring, pips, 6/8 numerals, trim */
@@ -401,6 +404,12 @@ strong { font-weight: 600; }
   transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 .button:hover { transform: translateY(-1px); }
+button.button { cursor: pointer; line-height: inherit; }   /* <button> needs these; links don't */
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
 .button--primary {
   background: var(--color-ink);
   color: var(--color-card);
@@ -716,6 +725,117 @@ strong { font-weight: 600; }
   line-height: 1.5;
 }
 
+/* Controls: a toolbar row of fields and buttons above a game (Watch/Play).
+   .field = a small label stacked over a select/input/checkbox. */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3) var(--space-4);
+  margin: var(--space-5) 0 var(--space-4);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+.field__label {
+  color: var(--color-ink-muted);
+  font-weight: 600;
+}
+.field__input {
+  min-width: 7rem;
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  color: var(--color-ink);
+  background: var(--color-card);
+  border: 1px solid var(--color-card-edge);
+  border-radius: var(--radius-card);
+}
+.field__input--short { min-width: 0; width: 7rem; }   /* numbers: seed */
+.field--check {                  /* checkbox + label on one line */
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+}
+.field--check input { width: 1.1rem; height: 1.1rem; accent-color: var(--color-token); }
+
+/* Status: one line saying what just happened or what to do next. Its HTML has
+   aria-live, so screen readers read each new message. .status--error = problem. */
+.status {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-card);
+  border: 1px solid var(--color-card-edge);
+  border-left: 3px solid var(--color-token);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+.status--error { border-left-color: var(--color-error); color: var(--color-error); }
+.status--turn { border-left-color: var(--player-a); font-weight: 600; }  /* "your turn" on Play */
+
+/* Board pair: two boards side by side (Watch); stacks on narrow screens. */
+.board-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+@media (max-width: 50rem) {
+  .board-pair { grid-template-columns: 1fr; }
+}
+
+/* Board panel: one game inside a .panel: title, whose turn, board, scores, log. */
+.board-panel { min-width: 0; }
+.board-panel__title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-xl);
+}
+.board-panel__order {
+  margin-left: var(--space-2);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--color-ink-muted);
+  letter-spacing: 0.08em;
+}
+.board-panel__turn {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+.board-panel .table-wrap { margin: var(--space-3) 0; }
+
+/* Move log: numbered list of moves so far, small print. */
+.move-log {
+  margin: 0;
+  padding-left: var(--space-5);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+.move-log li + li { margin-top: 0; }
+
+/* Player chip: the seat letter on its player colour, matching the board pieces.
+   Used in scoreboards. */
+.player-chip {
+  display: inline-block;
+  min-width: 1.5em;
+  padding: 0 0.3em;
+  border-radius: var(--radius-sm);
+  color: var(--board-piece-label);
+  font-weight: 600;
+  text-align: center;
+}
+.player-chip--a { background: var(--player-a); }
+.player-chip--b { background: var(--player-b); }
+.player-chip--c { background: var(--player-c); }
+.player-chip--d { background: var(--player-d); }
+
 /* Board: SVG drawing of the 19-hex board (sea, tiles, tokens, settlement spots,
    pieces). Styled here so every theme recolours it. Ready for the Watch/Play
    pages; also used by the style preview. Spot states:
@@ -755,6 +875,33 @@ strong { font-weight: 600; }
 .board__spot--blocked {
   fill: var(--board-blocked);
   stroke: none;
+}
+/* Play page: an open spot the human can pick. Grows and turns gold on hover or
+   keyboard focus so it's obvious what can be clicked. */
+.board__spot-button { cursor: pointer; }
+.board__hit { fill: transparent; }   /* invisible bigger tap area around an open spot */
+.board__spot-button .board__spot { stroke: var(--color-token); stroke-width: 2; }
+.board__spot-button:hover .board__spot,
+.board__spot-button:focus .board__spot {
+  fill: var(--color-token-face);
+  stroke-width: 3.5;
+}
+.board__spot-button:focus { outline: none; }    /* the thicker gold ring is the focus mark */
+/* Spot value written on an open spot ("Show values" option). */
+.board__spot-value {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 9px;
+  fill: var(--board-token-ink);
+  text-anchor: middle;
+  pointer-events: none;          /* clicks go to the spot underneath */
+}
+/* Gold ring around the newest settlement. */
+.board__last {
+  fill: none;
+  stroke: var(--color-token);
+  stroke-width: 2.5;
+  stroke-dasharray: 4 3;
 }
 .board__piece { stroke: var(--board-spot); stroke-width: 2; }
 .board__piece--a { fill: var(--player-a); }
@@ -805,4 +952,5 @@ strong { font-weight: 600; }
   .button:hover,
   .card:hover,
   .card:focus-within { transform: none; }
+  .button:disabled { transform: none; }
 }

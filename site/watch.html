@@ -1,0 +1,124 @@
+<!doctype html>
+<!--
+  watch.html: watch two computer games side by side, snake vs standard, on the same board.
+  Key parts:
+  - controls: seed, board type, Next move, Autoplay, Restart, New board
+  - status line (read out by screen readers as it changes)
+  - two board panels, each with whose turn it is, a scoreboard and a move log
+  The game runs in the browser: js/engine.js loads the Python engine (src/*.py)
+  with Pyodide; js/board.js draws the boards; js/watch.js runs this page.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Watch a game | Catan Settlement Strategy</title>
+  <meta name="description" content="Watch greedy computer players draft settlements on a Catan board, snake and standard order side by side.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/watch.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Site header (same on every page). -->
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="index.html">
+        <svg class="brand__mark" viewBox="0 0 26 30" aria-hidden="true"><polygon points="13,2 24,8.5 24,21.5 13,28 2,21.5 2,8.5"/></svg>
+        Catan Settlement Strategy
+      </a>
+      <nav class="nav" aria-label="Pages">
+        <a href="index.html">Dashboard</a>
+        <a href="watch.html" aria-current="page">Watch</a>
+        <a href="play.html">Play</a>
+        <a href="results.html">Results</a>
+        <a href="about.html">About</a>
+        <a href="https://github.com/quentin-drucker/catan-settlement-strategy">Source code</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+
+    <!-- Intro: what's on this page. -->
+    <h1>Watch a game</h1>
+    <p class="lede">
+      Four greedy computer players draft on the same board twice: once in snake order, once in
+      standard order. Step through both games together and watch the same spots go to different players.
+    </p>
+    <div class="ornament" aria-hidden="true"><span class="ornament__hex"></span></div>
+
+    <!-- Controls. Buttons start disabled and switch on once the engine has loaded. -->
+    <div class="controls wide">
+      <label class="field">
+        <span class="field__label">Seed</span>
+        <input class="field__input field__input--short" id="watch-seed" type="number" min="0" step="1" value="42">
+      </label>
+      <label class="field">
+        <span class="field__label">Board</span>
+        <select class="field__input" id="watch-board">
+          <option value="separated" selected>Separated (no 6/8 together)</option>
+          <option value="random">Random</option>
+        </select>
+      </label>
+      <button class="button button--primary" id="watch-next" type="button" disabled data-needs-engine>Next move</button>
+      <button class="button button--secondary" id="watch-auto" type="button" aria-pressed="false" disabled data-needs-engine>Autoplay</button>
+      <button class="button button--secondary" id="watch-restart" type="button" disabled data-needs-engine>Restart</button>
+      <button class="button button--secondary" id="watch-new" type="button" disabled data-needs-engine>New board</button>
+    </div>
+
+    <!-- Status: loading message, then a sentence per move. aria-live = read out when it changes. -->
+    <p class="status wide" id="watch-status" aria-live="polite">
+      Loading the Python game engine. The first visit downloads about 12 MB, so it can take a few seconds.
+    </p>
+
+    <!-- The two games: same board, different draft order. -->
+    <div class="board-pair wide">
+      <section class="panel board-panel" aria-labelledby="title-snake">
+        <h2 class="board-panel__title" id="title-snake">Snake <span class="board-panel__order">A B C D D C B A</span></h2>
+        <p class="board-panel__turn" id="turn-snake"></p>
+        <svg id="board-snake"></svg>
+        <div class="table-wrap">
+          <table class="data-table data-table--compact">
+            <thead><tr><th scope="col">Seat</th><th scope="col">Player</th><th scope="col">Spots (value)</th><th scope="col" class="num">Payoff</th></tr></thead>
+            <tbody id="scores-snake"></tbody>
+          </table>
+        </div>
+        <ol class="move-log" id="log-snake"></ol>
+      </section>
+      <section class="panel board-panel" aria-labelledby="title-standard">
+        <h2 class="board-panel__title" id="title-standard">Standard <span class="board-panel__order">A B C D A B C D</span></h2>
+        <p class="board-panel__turn" id="turn-standard"></p>
+        <svg id="board-standard"></svg>
+        <div class="table-wrap">
+          <table class="data-table data-table--compact">
+            <thead><tr><th scope="col">Seat</th><th scope="col">Player</th><th scope="col">Spots (value)</th><th scope="col" class="num">Payoff</th></tr></thead>
+            <tbody id="scores-standard"></tbody>
+          </table>
+        </div>
+        <ol class="move-log" id="log-standard"></ol>
+      </section>
+    </div>
+
+    <!-- How to read the boards. -->
+    <h2>What to look for</h2>
+    <ul>
+      <li>Every turn, both games take the same spot. Greedy players only look at the board, never at who is picking.</li>
+      <li>Turns 1 to 4 are identical. From turn 5 the orders split: snake gives D two picks in a row, standard goes back to A.</li>
+      <li>Under standard, A collects the best first pick and the best leftover. Under snake, the leftovers flow back towards D.</li>
+      <li>Houses are settlements (letter = player). Grey dots are blocked spots, next to a settlement. The gold ring marks the newest move.</li>
+    </ul>
+    <p>Replay the same game in the terminal with <code>python main.py play --seed 42 --draft snake</code>.</p>
+  </main>
+
+  <!-- Footer (same on every page). -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>Quentin Drucker and Emmett Manning, COM313 Algorithmic Game Theory, Prof. Christine Chung</p>
+      <p><a href="https://github.com/quentin-drucker/catan-settlement-strategy">Source code on GitHub</a></p>
+      <p>Rebuild every number with <code>python main.py experiments --games 100000</code></p>
+    </div>
+  </footer>
+</body>
+</html>
