@@ -14,7 +14,7 @@ and the commands to test it yourself.
 | 2 | #2 Placement rules + scoring | **Done** – `src/game.py`, `src/player.py`, `tests/test_game.py` (39 tests; 63 in total) |
 | 3 | #3 Greedy CPU + draft | **Done** – `src/strategies.py`, `src/game.py`, `python main.py play` (123 tests in total) |
 | 4 | #4 Simulations + fairness analysis | **Done** – `src/simulation.py`, `src/analysis.py`, `python main.py experiments` (132 tests in total) |
-| 5 | #5 Interactive website (GitHub Pages): play + watch games in the browser | Not started (replaces the Pygame plan) |
+| 5 | #5 Interactive website (GitHub Pages): play + watch games in the browser | **In progress** – step 1 done: Dashboard, Results, About, deploy workflow (replaces the Pygame plan) |
 | 6 | #6 Blocking-aware CPU (optional) | Not started |
 | – | Terminal board view (backup to the website) | **Done** – `src/text_view.py`; `play --step`, `play --human A`, `explore` |
 | – | README, docs, `main.py` CLI | README written (install, usage, layout); grows with each step |
@@ -110,7 +110,13 @@ Hosting:
   so Pages is free.
 
 Build order (each step leaves a working site):
-1. Dashboard + Results + About (static) + deploy workflow -> site live with the findings.
+1. Dashboard + Results + About (static) + deploy workflow -> site live with the findings. **Done.**
+   - `site/css/styles.css` = all styling; design values as CSS variables at the top.
+   - Fonts in `site/fonts/` (Newsreader, Archivo; open licence). Charts use the same Archivo files.
+   - `site/build_site.py` assembles `_site/` (pages + charts) for the workflow and local preview.
+   - Board drawing component (`.board`) already in styles.css for steps 2-3.
+   - Style options: 3 alternative themes live in styles.css section 1b until one is picked;
+     the unused ones (and their fonts) then get deleted.
 2. Watch page (Pyodide + SVG board).
 3. Play page (same board drawing + clicks).
 4. Strategies page if Issue #6 happens.

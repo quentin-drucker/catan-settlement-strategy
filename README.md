@@ -75,11 +75,24 @@ python main.py experiments --games 100000 --seed 0
 - 100,000 games per setup takes a few minutes. `--games 10000` is enough for a quick look.
 - Design + findings: [docs/experiments.md](docs/experiments.md).
 
-## Website (in progress)
+## Website
 
-Final showcase = a GitHub Pages site with a dashboard linking to: play a game in the
-browser, watch CPU games step by step, the 100,000-game results, and background on the
-project. Plan: [docs/implementation_plan.md](docs/implementation_plan.md) (Step 5).
+GitHub Pages site: dashboard, Results (charts + tables) and About (background, rules,
+method). Watch and Play pages (games in the browser) are next.
+Plan: [docs/implementation_plan.md](docs/implementation_plan.md) (Step 5).
+
+- Live (after merging to `main`): https://quentin-drucker.github.io/catan-settlement-strategy/
+- Files: `site/` (pages, `css/styles.css`, fonts). Charts come from `results/`.
+- Deploys automatically on every push to `main` (`.github/workflows/pages.yml`).
+  One-time setup: repo Settings -> Pages -> Source: "GitHub Actions".
+- Preview locally:
+
+```
+python site/build_site.py
+python -m http.server --directory _site
+```
+
+  then open http://localhost:8000.
 
 ## Tests
 
@@ -101,6 +114,8 @@ src/text_view.py     terminal board view
 tests/               pytest suite
 docs/                implementation plan + per-issue testing guides
 results/             summary.md + charts (raw CSVs in results/raw/, git-ignored)
+site/                website pages, styles.css, fonts, build_site.py
+.github/workflows/   pages.yml: publishes the website
 ```
 
 More detail:
