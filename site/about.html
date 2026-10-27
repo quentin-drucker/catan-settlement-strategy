@@ -129,37 +129,15 @@
         </tbody>
       </table>
     </div>
-    <p>
-      Example: a corner touching an 8, a 5 and a 9 is worth 5 + 4 + 4 = 13, so it produces something on
-      13 of every 36 rolls on average. The desert counts as 0, and 7 has no tile.
-    </p>
 
-    <!-- Experiments: setups + measures (summary of docs/experiments.md). -->
-    <h2>How the experiments work</h2>
+    <!-- Additional information: setups, seeds, tie-breaks, limits. -->
+    <h2>Additional Information</h2>
     <ul>
-      <li>Four setups: snake or standard draft, on separated or random boards. 100,000 games each.</li>
-      <li>Game number <em>i</em> uses random seed <em>i</em> in every setup. The board depends only on the seed and the board type, so snake and standard play exactly the same boards, and the draft order is the only difference.</li>
-      <li>Greedy players break ties between equally good corners at random, with a seeded generator, so every game can be replayed exactly.</li>
-      <li>Measures: average payoff per seat with a 95% confidence interval, the fairness gap (best seat average minus worst), the average best-minus-worst spread inside a game, win share (ties split evenly), the value of each seat's first and second pick, and how often each corner is taken.</li>
+      <li>Four different setups are run, snake draft and standard draft on both 'true random' and 'traditional separated' board types.</li>
+      <li>Each game "I" uses the seed "I", meaning that our results are replicable and board layout is generally similar, with differences coming from having to split up 6s and 8s for 'traditional separated' boards.</li>
+      <li>Greedy players will break ties between same-value spots at random, but that random number is calculated from the seed so this is repeatable as well.</li>
+      <li>Strategy is limited by the greedy nature of CPU players, they will not strategically block other players as an actual Catan player might.</li>
     </ul>
-
-    <!-- Limits (same caveat as the Results page). -->
-    <div class="note">
-      <p><strong>Limits.</strong> Greedy players only look one move ahead and never block on purpose.
-        An optional extension of the project tests a player that also weighs the corners it takes away
-        from opponents.</p>
-    </div>
-
-    <!-- Team, course and code. -->
-    <h2>Team and course</h2>
-    <p>
-      Quentin Drucker and Emmett Manning, COM313 Algorithmic Game Theory, taught by Professor Christine Chung.
-    </p>
-    <p>
-      The simulation is written in Python. The <a href="https://github.com/quentin-drucker/catan-settlement-strategy">source
-      code</a> includes the board model, the game rules, the computer players, the simulations, the analysis
-      that produced every number on this site, and the automated tests.
-    </p>
   </main>
 
   <!-- Footer (same on every page). -->
