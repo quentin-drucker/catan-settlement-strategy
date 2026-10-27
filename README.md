@@ -77,8 +77,14 @@ python main.py experiments --games 100000 --seed 0
 
 ## Website
 
-GitHub Pages site: dashboard, Results (charts + tables) and About (background, rules,
-method). Watch and Play pages (games in the browser) are next.
+GitHub Pages site with a dashboard linking to:
+- **Watch:** two computer games on the same board, snake vs standard, step by step or Autoplay
+- **Play:** draft against three greedy computer players by clicking spots on the board
+- **Results:** charts and tables from the 100,000-game runs
+- **About:** background, rules, scoring, method
+
+Watch and Play run the real Python engine (`src/`) inside the browser with Pyodide
+(Python compiled to WebAssembly), so there's no server and the rules are the tested ones.
 Plan: [docs/implementation_plan.md](docs/implementation_plan.md) (Step 5).
 
 - Live (after merging to `main`): https://quentin-drucker.github.io/catan-settlement-strategy/
@@ -111,10 +117,11 @@ src/strategies.py    CPU strategies (greedy)
 src/simulation.py    batch games -> CSV
 src/analysis.py      statistics, report, charts
 src/text_view.py     terminal board view
+src/web.py           bridge between the website and the engine (JSON in/out)
 tests/               pytest suite
 docs/                implementation plan + per-issue testing guides
 results/             summary.md + charts (raw CSVs in results/raw/, git-ignored)
-site/                website pages, styles.css, fonts, build_site.py
+site/                website pages, styles.css, js/ (engine loader, board drawing, pages), fonts
 .github/workflows/   pages.yml: publishes the website
 ```
 
