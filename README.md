@@ -75,7 +75,11 @@ python main.py experiments --games 100000 --seed 0
 - 100,000 games per setup takes a few minutes. `--games 10000` is enough for a quick look.
 - Design + findings: [docs/experiments.md](docs/experiments.md).
 
-Still to come: a Pygame window (Issue #5).
+## Website (in progress)
+
+Final showcase = a GitHub Pages site with a dashboard linking to: play a game in the
+browser, watch CPU games step by step, the 100,000-game results, and background on the
+project. Plan: [docs/implementation_plan.md](docs/implementation_plan.md) (Step 5).
 
 ## Tests
 

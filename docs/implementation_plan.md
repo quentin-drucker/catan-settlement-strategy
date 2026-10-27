@@ -14,9 +14,9 @@ and the commands to test it yourself.
 | 2 | #2 Placement rules + scoring | **Done** – `src/game.py`, `src/player.py`, `tests/test_game.py` (39 tests; 63 in total) |
 | 3 | #3 Greedy CPU + draft | **Done** – `src/strategies.py`, `src/game.py`, `python main.py play` (123 tests in total) |
 | 4 | #4 Simulations + fairness analysis | **Done** – `src/simulation.py`, `src/analysis.py`, `python main.py experiments` (132 tests in total) |
-| 5 | #5 Pygame interactive mode | Not started |
+| 5 | #5 Interactive website (GitHub Pages): play + watch games in the browser | Not started (replaces the Pygame plan) |
 | 6 | #6 Blocking-aware CPU (optional) | Not started |
-| – | Terminal board view (backup to the Pygame window) | **Done** – `src/text_view.py`; `play --step`, `play --human A`, `explore` |
+| – | Terminal board view (backup to the website) | **Done** – `src/text_view.py`; `play --step`, `play --human A`, `explore` |
 | – | README, docs, `main.py` CLI | README written (install, usage, layout); grows with each step |
 
 ## Step 1 – Board (done)
@@ -79,14 +79,44 @@ and the commands to test it yourself.
 - Box plot of payoff spread dropped: payoffs are whole numbers, so the boxes collapse;
   replaced by win share per seat.
 
-## Step 5 – Pygame interactive mode (`src/visualization.py`)
+## Step 5 – Project website on GitHub Pages (replaces the Pygame window)
 
-- Only reads/writes through the `Game` API; the simulation never imports Pygame.
-- Draw hexes and tokens; vertices shown as legal / blocked / occupied (player colour).
-  Hover shows a vertex's value. Click a legal vertex on the human's turn. CPU turns
-  advance with a short delay. Side panel shows the turn, the current player and scores.
-  `R` = new board, `Esc` = quit.
-- Test headlessly (`SDL_VIDEODRIVER=dummy`): pixel→vertex hit-testing and a scripted game.
+Final presentation = one website with a main dashboard; each card opens a page.
+
+Pages:
+- **Dashboard** (`index.html`): one-line summary, headline numbers, cards linking to the pages below.
+- **Play**: click spots on a drawn board against 3 greedy CPUs. Legal / blocked / taken
+  spots shown; hover = spot value; options for seed, draft, board mode, which seat to play.
+- **Watch**: CPU game step by step (Next / Autoplay). Snake and standard side by side on the
+  same board -> shows "same spots, different owners".
+- **Results**: the 100,000-game findings: headline table, the 5 charts, short explanations
+  (content from `docs/experiments.md` and `results/summary.md`).
+- **About**: background on the topic (course needs >= 1 page), rules, scoring, method, limits.
+- **Strategies** (only if Issue #6 is done): blocking CPU vs greedy. No card until it exists.
+
+How the game runs in the browser:
+- **Pyodide** (Python compiled to WebAssembly) runs the existing `src/board.py`,
+  `player.py`, `strategies.py`, `game.py` unchanged; they only use the standard library.
+  - Same seed -> same board and same game as the CLI and the CSVs.
+  - One tested rule set; no JavaScript copy of the game logic to keep in sync.
+  - Cost: ~5-10 MB download, a few seconds to load once (shown with a loading message).
+- JavaScript only draws the board (SVG) and handles clicks/buttons, calling the Python `Game` API.
+- Results page is static: charts from `results/*.png`, numbers from `results/summary.md`.
+
+Hosting:
+- Website files in `site/`. A GitHub Actions workflow publishes `site/` + `src/` + `results/`
+  to GitHub Pages on every push to `main`.
+- One-time setup: repo Settings -> Pages -> Source: "GitHub Actions". The repo is public,
+  so Pages is free.
+
+Build order (each step leaves a working site):
+1. Dashboard + Results + About (static) + deploy workflow -> site live with the findings.
+2. Watch page (Pyodide + SVG board).
+3. Play page (same board drawing + clicks).
+4. Strategies page if Issue #6 happens.
+
+Checks: Python tests still cover all game logic; each page opened in a browser and checked
+by hand (board draws, clicks, no console errors) before merging.
 
 ## Step 6 – Blocking-aware CPU (optional, only after 1–5)
 
@@ -94,6 +124,7 @@ and the commands to test it yourself.
   value still available to the next opponent** caused by placing `v` (not the sum of
   every blocked vertex, which would over-count options nobody would take).
 - Compare against greedy in each seat on identical seeds.
+- If done: gets its own "Strategies" page on the website (Step 5).
 
 ## Final deliverables (presentation)
 
@@ -107,9 +138,11 @@ Charts and demos to build once the simulations exist (Step 4 onward):
   first pick but the worst second pick).
 - **Fairness gap table:** snake/standard × random/separated boards.
 - **Win share per seat** (replaced the box plot): balanced averages can still hide who actually wins.
-- **Live demo:** human vs three greedy CPUs in the Pygame window (Step 5).
+- **Website** (Step 5): dashboard -> Play / Watch / Results / About, hosted on GitHub Pages.
+  The charts above live on the Results page.
 - **Optional:** blocking CPU vs greedy, payoff gain by seat (Step 6).
-- **Docs:** README (install, run, reproduce), one-page background, architecture diagram.
+- **Docs:** README (install, run, reproduce, website link), one-page background (also the
+  website's About page), architecture diagram.
 
 ## Decisions needing team approval
 
