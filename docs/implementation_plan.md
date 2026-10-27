@@ -14,7 +14,7 @@ and the commands to test it yourself.
 | 2 | #2 Placement rules + scoring | **Done** – `src/game.py`, `src/player.py`, `tests/test_game.py` (39 tests; 63 in total) |
 | 3 | #3 Greedy CPU + draft | **Done** – `src/strategies.py`, `src/game.py`, `python main.py play` (123 tests in total) |
 | 4 | #4 Simulations + fairness analysis | **Done** – `src/simulation.py`, `src/analysis.py`, `python main.py experiments` (132 tests in total) |
-| 5 | #5 Interactive website (GitHub Pages): play + watch games in the browser | **Done** – Dashboard, Watch, Play, Results, About + deploy workflow (replaces the Pygame plan) |
+| 5 | #5 Interactive website (GitHub Pages): play + watch games in the browser | **Done** – Introduction, Watch, Play, Results + deploy workflow (replaces the Pygame plan) |
 | 6 | #6 Blocking-aware CPU (optional) | Not started |
 | – | Terminal board view (backup to the website) | **Done** – `src/text_view.py`; `play --step`, `play --human A`, `explore` |
 | – | README, docs, `main.py` CLI | README written (install, usage, layout); grows with each step |
@@ -81,18 +81,18 @@ and the commands to test it yourself.
 
 ## Step 5 – Project website on GitHub Pages (replaces the Pygame window)
 
-Final presentation = one website with a main dashboard; each card opens a page.
+Final presentation = one website that opens on the Introduction page; the top menu links every page.
 
 Pages:
-- **Dashboard** (`dashboard.html`): one-line summary, headline numbers, cards linking to the pages below.
 - **Play**: click spots on a drawn board against 3 greedy CPUs. Legal / blocked / taken
   spots shown; hover = spot value; options for seed, draft, board mode, which seat to play.
 - **Watch**: CPU game step by step (Next / Autoplay). Snake and standard side by side on the
   same board -> shows "same spots, different owners".
 - **Results**: the 100,000-game findings: headline table, the 5 charts, short explanations
   (content from `docs/experiments.md` and `results/summary.md`).
-- **Introduction** (`index.html`, home page; was "About"): background on the topic (course needs >= 1 page), rules, scoring, method, limits.
-- **Strategies** (only if Issue #6 is done): blocking CPU vs greedy. No card until it exists.
+- **Introduction** (`index.html`, home page; was "About"): background on the topic (course needs >= 1 page), what the model includes, scoring, method.
+  (The Dashboard page was removed: it repeated the Introduction and simplified the Results charts.)
+- **Strategies** (only if Issue #6 is done): blocking CPU vs greedy. No menu link until it exists.
 
 How the game runs in the browser:
 - **Pyodide** (Python compiled to WebAssembly) runs the existing `src/board.py`,
@@ -110,7 +110,7 @@ Hosting:
   so Pages is free.
 
 Build order (each step leaves a working site):
-1. Dashboard + Results + About (static) + deploy workflow -> site live with the findings. **Done.**
+1. Introduction + Results (static) + deploy workflow -> site live with the findings. **Done.**
    - `site/css/styles.css` = all styling; design values as CSS variables at the top.
    - Style: **"Board-game box"** (chosen from 4 options): warm grey card stock, warm dark ink,
      wheat-gold tokens, Zilla Slab headings + Archivo text. Charts use the same colours and font.
@@ -155,11 +155,11 @@ Charts and demos to build once the simulations exist (Step 4 onward):
   first pick but the worst second pick).
 - **Fairness gap table:** snake/standard × random/separated boards.
 - **Win share per seat** (replaced the box plot): balanced averages can still hide who actually wins.
-- **Website** (Step 5): dashboard -> Play / Watch / Results / About, hosted on GitHub Pages.
+- **Website** (Step 5): Introduction / Watch / Play / Results, hosted on GitHub Pages.
   The charts above live on the Results page.
 - **Optional:** blocking CPU vs greedy, payoff gain by seat (Step 6).
 - **Docs:** README (install, run, reproduce, website link), one-page background (also the
-  website's About page), architecture diagram.
+  website's Introduction page), architecture diagram.
 
 ## Decisions needing team approval
 
