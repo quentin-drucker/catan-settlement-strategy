@@ -43,7 +43,7 @@ SETUPS = [("snake", "separated"), ("standard", "separated"), ("snake", "random")
 # Data colours come from the validated reference palette: blue = snake, orange = standard.
 SURFACE = "#FBF7EC"  # card-stock panel the charts sit in on the website
 TEXT = "#2B2622"  # warm dark ink
-TEXT_SECONDARY = "#5C5249"  # muted ink
+TEXT_SECONDARY = "#554B42"  # muted ink
 GRID = "#DCCFB2"  # hairline rules
 TILE, TILE_EDGE = "#E7E2D4", "#C4BCA8"  # hex tiles in the board heatmap
 DRAFT_COLORS = {"snake": "#2a78d6", "standard": "#eb6834"}

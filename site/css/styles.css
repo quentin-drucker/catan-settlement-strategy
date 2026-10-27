@@ -37,7 +37,7 @@
   --color-card-edge: #D8C9A8;    /* panel/card border */
   --color-ink: #2B2622;          /* body text + headings (~12.6:1 on paper) */
   --color-ink-soft: #423A33;     /* primary button hover */
-  --color-ink-muted: #5C5249;    /* captions, secondary text (~6.4:1 on paper) */
+  --color-ink-muted: #554B42;    /* captions, secondary text (~7:1 on plain paper, >= 4.5:1 on texture) */
   --color-rule: #DCCFB2;         /* hairlines, table borders */
   --color-focus: #86630E;        /* keyboard focus ring (>= 3:1 on paper) */
   --color-gilt: rgba(178, 140, 52, 0.55);  /* thin gold inner frame (decoration only) */
@@ -58,7 +58,7 @@
   --board-tile: #E7E2D4;         /* land hexes (no resources in this model) */
   --board-tile-edge: #C4BCA8;
   --board-spot: #FFFFFF;         /* empty settlement spot */
-  --board-spot-edge: #5C5249;
+  --board-spot-edge: #554B42;
   --board-blocked: #C4BCA8;      /* spot next to a settlement */
   --board-token-face: var(--color-token-face);
   --board-token-ink: var(--color-ink);
@@ -110,13 +110,18 @@
   --shadow-card-hover: 0 2px 2px rgba(60, 42, 14, 0.08), 0 16px 26px -14px rgba(60, 42, 14, 0.45);
   --frame-inset: inset 0 0 0 5px var(--color-card), inset 0 0 0 6px var(--color-gilt);
 
-  /* Parchment texture, drawn by the browser from two tiny inline SVGs (no image
-     files). feTurbulence = random "noise"; the colour matrix turns it into faint
-     brown specks (grain) and large soft blotches (mottling). Kept very light so
-     text contrast stays >= 4.5:1. */
-  --texture-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.27 0 0 0 0 0.12 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-  --texture-mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.40 0 0 0 0 0.16 0 0 0 0.16 -0.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
-  --vignette: radial-gradient(ellipse at 50% 35%, transparent 60%, rgba(120, 88, 40, 0.09) 100%);
+  /* Parchment texture, drawn by the browser from small inline SVG tiles (no image
+     files). feTurbulence = random "noise"; each colour matrix turns it into brown
+     marks of one kind. Layers, top to bottom:
+       grain  - fine specks everywhere
+       specks - sparse darker flecks (only the strongest noise shows)
+       mottle - large soft blotches, like age stains
+     Measured: the darkest 1% of the page stays light enough for every text colour
+     used on it to keep >= 4.5:1 contrast. */
+  --texture-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.30 0 0 0 0 0.22 0 0 0 0 0.10 0 0 0 0.50 -0.23'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --texture-specks: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.32' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.25 0 0 0 0 0.17 0 0 0 0 0.06 0 0 0 2.50 -1.68'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+  --texture-mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.52 0 0 0 0 0.38 0 0 0 0 0.14 0 0 0 0.35 -0.12'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  --vignette: radial-gradient(ellipse at 50% 35%, transparent 55%, rgba(110, 78, 32, 0.10) 100%);
 }
 
 
@@ -164,8 +169,8 @@ html {
 body {
   margin: 0;
   background-color: var(--color-paper);
-  background-image: var(--vignette), var(--texture-mottle), var(--texture-grain);
-  background-attachment: fixed, scroll, scroll;  /* edges stay shaded while scrolling */
+  background-image: var(--vignette), var(--texture-specks), var(--texture-grain), var(--texture-mottle);
+  background-attachment: fixed, scroll, scroll, scroll;  /* edges stay shaded while scrolling */
   color: var(--color-ink);
   font-family: var(--font-text);
   font-size: var(--text-md);
