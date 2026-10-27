@@ -3,7 +3,7 @@
   about.html: background and method (also the project's one-page background).
   Key parts:
   - background: Catan's opening, draft orders, the game-theory framing
-  - the model's rules
+  - in summary: what the model does and doesn't include, side by side
   - scoring: dice-weight table drawn as Catan number tokens with pips
   - experiments, limits, team and course, where the code lives
   Sources: proposal, docs/experiments.md, src/board.py (dice weights).
@@ -51,51 +51,62 @@
     <!-- Background: the topic, the draft-order question, and the game-theory framing. -->
     <h2>Background</h2>
     <p>
-      In <em>Settlers of Catan</em>, the board is a set of hexagonal tiles, each marked with a number
-      from 2 to 12. Every turn two dice are rolled, and every settlement next to a tile with that number
-      collects resources. Numbers near 7 come up most often: a 6 or an 8 can be rolled 5 ways out of
-      36, a 2 or a 12 only one way. The printed tokens show this with dots under the number.
+      In Settlers of Catan the board is a set of hexagonal tiles, each marked with a number from 2 to 12
+      but excluding 7. Every turn two dice are rolled, and every settlement next to a tile with that
+      number collects resources. Numbers near 7 come up most often: a 6 or an 8 can each be rolled 5 ways
+      out of 36, a 2 or a 12 only one way. The printed tokens show this with dots under the number
+      representing their probabilities.
     </p>
     <p>
       Settlements sit on the corners where tiles meet, and two settlements may never be on neighbouring
-      corners. So the opening placements matter twice: a good corner pays off all game, and taking it
-      also removes it, and the corners next to it, from everyone who picks later.
+      corners, occupy the same corner, or be moved/destroyed; so the opening placement matters a lot for
+      each player's game trajectory. The order of the opening placement is decided with a single dice
+      roll from each player, usually played where the highest roll goes first.
     </p>
     <p>
-      That creates a first-mover problem. The player who places first gets the best corner on the board.
-      The official rules already respond to this with a snake order: first settlements go around the
-      table one way, and second settlements come back the other way, so the last player places twice in
-      a row. Fantasy sports drafts use the same idea for the same reason. Whether the snake actually
-      evens things out, and by how much, is an empirical question, and it is the question this project
-      measures.
+      That creates a problem where the player who places first gets the best spot on the board. The
+      official rules already respond to this with something called a “snake draft”, which is effective
+      because each player must place two settlements. A snake draft dictates the initial highest first
+      order happens first, and then its inverse happens. So, the player who places first also places
+      last, and the player who rolled the lowest starting number places both of their settlements at the
+      same time.
     </p>
     <p>
-      In game-theory terms, the opening is a finite sequential game with perfect information: players
-      move one at a time, everyone sees every earlier move, and the set of legal moves (open corners)
-      shrinks after each placement. Each player's utility here is the expected production of their two
-      settlements. The game could in principle be solved by backward induction (working out the best move
-      from the last turn back to the first), but the number of possible move sequences is far too large to
-      search completely, so this project does not compute equilibrium play. Instead, every player follows
-      a simple greedy rule, taking the open corner worth the most right now, and the study measures how
-      outcomes differ by seat across many randomly generated boards.
-    </p>
-    <p>
-      The results are about fairness in practice, not about equilibria. A small gap between seats means
-      that, for these players, no seat is consistently better off. It does not prove the draft is fair for
-      every kind of player, and it is not a Nash equilibrium or price-of-anarchy result.
+      In game-theory terms, the opening is a finite sequential game with perfect information. Players
+      move one at a time with everyone seeing every earlier move and the set of legal moves shrinks after
+      each placement. So in our game, which is limited to just the opening placements, each player's
+      payoff is the sum total of the tiles’ probabilities (out of 36) that their settlements lie on.
+      Playing optimally and taking only the highest value spot every turn means that every player follows
+      a simple greedy rule.
     </p>
 
-    <!-- The model: what is and isn't simulated. -->
-    <h2>The model</h2>
-    <ul>
-      <li>Standard 19-tile board in rows of 3, 4, 5, 4 and 3, with 54 corners (settlement spots).</li>
-      <li>Standard number tokens: one each of 2 and 12, two each of 3 to 6 and 8 to 11, plus one desert tile with no number.</li>
-      <li>Four players, A to D, place two settlements each: eight placements in total.</li>
-      <li>A settlement can't go on a taken corner or on a corner directly next to one. The rule applies to everyone, including a player's own settlements.</li>
-      <li>Snake order: A B C D D C B A. Standard order: A B C D A B C D.</li>
-      <li>Two board types: <strong>random</strong> (tokens shuffled freely) and <strong>separated</strong> (reshuffled until no 6 or 8 touches another 6 or 8). Separated is the default.</li>
-      <li>Left out on purpose: roads, trading, development cards, resource types, the robber and dice rolling.</li>
-    </ul>
+    <!-- In summary: what the simulation does and doesn't include, side by side. -->
+    <h2>In Summary</h2>
+    <div class="card-grid">
+      <div class="panel">
+        <h3>We consider</h3>
+        <ul>
+          <li>The whole, classic, 19 tile Catan board with 54 possible settlement spots.</li>
+          <li>The standard number tokens, one each of 2 and 12 and two of all others excluding 7.</li>
+          <li>Four players and their two settlements each.</li>
+          <li>That settlements may not occupy adjacent corners.</li>
+          <li>The snake draft (A B C D D C B A) and standard order draft (A B C D A B C D).</li>
+          <li>The ‘true random’ board type and the ‘traditional separated’ board type.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>We do not consider</h3>
+        <ul>
+          <li>Roads attached to settlements.</li>
+          <li>Resources associated with each tile.</li>
+          <li>Trading resource cards between players.</li>
+          <li>Exchanging resources at ports/with the bank.</li>
+          <li>Development cards.</li>
+          <li>The robber and other actions associated with rolling a 7.</li>
+          <li>The overall trajectory that consistent random dice rolls lead the game to have.</li>
+        </ul>
+      </div>
+    </div>
 
     <!-- Scoring: dice weights as tokens; pips = ways to roll the number out of 36 (src/board.py). -->
     <h2>Scoring</h2>
