@@ -8,7 +8,6 @@ Live: https://quentin-drucker.github.io/catan-settlement-strategy/
 | File | Purpose |
 |---|---|
 | `site/index.html` | Introduction (home page): background, what the model includes, scoring, method |
-| `site/dashboard.html` | Dashboard: question + answer, token strip, headline numbers, cards to every page |
 | `site/watch.html` + `site/js/watch.js` | Two computer games on the same board, snake vs standard, step by step |
 | `site/play.html` + `site/js/play.js` | One human seat against three greedy computer players |
 | `site/results.html` | Charts/tables from the 100,000-game runs |

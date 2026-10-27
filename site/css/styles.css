@@ -10,8 +10,8 @@
    3. Layout             page width, header + nav, main column, footer.
    4. Components         reusable pieces, one class each (+ "--modifier" variations):
                          .skip-link, .lede, .byline, .ornament, .button, .panel,
-                         .stats/.stat, .token-strip, .token, .figure, .data-table,
-                         .card-grid/.card, .badge, .note, .command, .board,
+                         .token, .figure, .data-table,
+                         .card-grid, .note, .command, .board,
                          game pages: .controls/.field, .status, .board-pair,
                          .board-panel, .move-log, .player-chip
    5. Page tweaks        small page-specific adjustments (kept short).
@@ -42,11 +42,6 @@
   --color-focus: #86630E;        /* keyboard focus ring (>= 3:1 on paper) */
   --color-gilt: rgba(178, 140, 52, 0.55);  /* thin gold inner frame (decoration only) */
 
-  /* Data colours (same as the charts; validated colour-blind safe) */
-  --color-snake: #2a78d6;
-  --color-standard: #eb6834;
-  --color-snake-text: #1f62b3;   /* darker steps for text, so labels pass 4.5:1 */
-  --color-standard-text: #a33c15;
   --color-error: #a33c15;        /* rejected move / load failure messages (5.5:1) */
 
   /* Catan number tokens */
@@ -247,7 +242,7 @@ strong { font-weight: 600; }
   gap: var(--space-4);
 }
 
-/* Brand = hex mark + project name in the heading font, links to the dashboard. */
+/* Brand = hex mark + project name in the heading font, links to the Introduction (home page). */
 .brand {
   display: inline-flex;
   align-items: center;
@@ -389,13 +384,7 @@ strong { font-weight: 600; }
 
 /* Buttons: links styled as buttons, for the main actions on a page.
    .button--primary = dark with a thin gold inner line (game-box trim);
-   .button--secondary = light card stock. Used on the dashboard. */
-.button-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin: var(--space-5) 0 0;
-}
+   .button--secondary = light card stock. */
 .button {
   display: inline-flex;
   align-items: center;
@@ -441,91 +430,8 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   padding: var(--space-5);
 }
 
-/* Stats: headline numbers as small tiles in a 2 x 2 grid, each with a gold top
-   edge. Used on the dashboard. .stat__value--snake / --standard tint a number by draft. */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-4);
-  margin: var(--space-5) 0 var(--space-6);
-  padding: 0;
-  list-style: none;
-}
-.stat {
-  margin: 0;
-  padding: var(--space-4) var(--space-5);
-  background: var(--color-card);
-  border: 1px solid var(--color-card-edge);
-  border-radius: var(--radius-card);
-  box-shadow: inset 0 3px 0 var(--color-token), var(--shadow-card);
-}
-.stat__value {
-  display: block;
-  font-family: var(--font-ui);
-  font-size: var(--text-2xl);
-  font-weight: 600;
-  line-height: 1.1;
-  font-variant-numeric: lining-nums;
-}
-.stat__value--snake { color: var(--color-snake-text); }
-.stat__value--standard { color: var(--color-standard-text); }
-.stat__label {
-  display: block;
-  margin-top: var(--space-2);
-  font-family: var(--font-ui);
-  font-size: var(--text-sm);
-  line-height: 1.4;
-  color: var(--color-ink-muted);
-}
-
-/* Token strip: the 8 greedy picks in turn order as Catan-style tokens, with who
-   gets each pick under snake and standard. A real <table>, so screen readers
-   read it as rows and columns. Used on the dashboard. */
-.token-strip-wrap {
-  overflow-x: auto;              /* only scrolls on very narrow screens */
-  margin: var(--space-5) 0 var(--space-6);
-}
-.token-strip {
-  border-collapse: collapse;
-  margin: 0 auto;
-  font-family: var(--font-ui);
-}
-.token-strip caption {
-  caption-side: bottom;          /* caption reads as a source line under the strip */
-  padding-top: var(--space-3);
-  margin-top: 0;
-}
-.token-strip th,
-.token-strip td {
-  padding: var(--space-1) var(--space-1);
-  text-align: center;
-  font-weight: 400;
-}
-.token-strip th[scope="row"] {
-  text-align: right;
-  padding-right: var(--space-3);
-  font-size: var(--text-sm);
-  color: var(--color-ink-muted);
-  white-space: nowrap;
-}
-.token-strip__turn {
-  font-size: var(--text-xs);
-  color: var(--color-ink-muted);
-}
-.token-strip__owner {
-  font-size: var(--text-md);
-  font-weight: 600;
-}
-.token-strip__owner--snake { color: var(--color-snake-text); }
-.token-strip__owner--standard { color: var(--color-standard-text); }
-.token-strip__divider th,
-.token-strip__divider td {
-  border-top: 1px solid var(--color-rule);
-}
-
 /* Token: one round Catan number token (disc + number, optional pips).
-   Used in the token strip and the dice-weight table (About).
-   .token--late = picks 5-8, drawn lighter: the leftovers after round one.
+   Used in the dice-weight table (Introduction).
    .token--high = a 6 or 8 (the most likely numbers), numeral in ochre. */
 .token {
   display: inline-flex;
@@ -543,10 +449,6 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   line-height: 1;
   color: var(--color-ink);
   font-variant-numeric: lining-nums tabular-nums;
-}
-.token--late {
-  border-style: dashed;
-  font-weight: 400;
 }
 .token--high { color: var(--color-token); }
 /* Pips = the dots under a token's number; count = ways to roll it out of 36. */
@@ -576,7 +478,7 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
 }
 
 /* Data table: numbers right-aligned in equal-width digits so columns line up.
-   Used on Results (seat tables) and About (rules). Wrap in .table-wrap (+ .panel)
+   Used on Results (seat tables) and Introduction (dice weights). Wrap in .table-wrap (+ .panel)
    so wide tables scroll sideways on phones instead of breaking the page. */
 .table-wrap {
   overflow-x: auto;
@@ -615,98 +517,17 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
 .data-table__row--key td,
 .data-table__row--key th { font-weight: 600; }
 
-/* Card grid: the dashboard's links to the other pages. Each card is one page,
-   with a gold hex marker, a title and one line on what's there. The whole card
-   is clickable: the title link's ::after stretches over the card.
-   .card--planned = page not built yet (no link, dashed outline, muted). */
+/* Card grid: two columns side by side (one column on phones). Used for the
+   "In Summary" lists on the Introduction page. */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-4);
   margin: var(--space-4) 0;
-  padding: 0;
-  list-style: none;
-}
-.card {
-  position: relative;
-  margin: 0;
-  padding: var(--space-5) var(--space-5) var(--space-5) calc(var(--space-5) + 1.4rem);
-  background: var(--color-card);
-  border: 1px solid var(--color-card-edge);
-  border-radius: var(--radius-card);
-  box-shadow: var(--frame-inset), var(--shadow-card);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-.card::before {                  /* the hex marker (CSS-only shape) */
-  content: "";
-  position: absolute;
-  left: var(--space-5);
-  top: calc(var(--space-5) + 0.3rem);
-  width: 0.85rem;
-  height: 0.98rem;
-  background: var(--color-token);
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-}
-.card:hover,
-.card:focus-within {
-  transform: translateY(-2px);
-  box-shadow: var(--frame-inset), var(--shadow-card-hover);
-}
-.card__title {
-  display: block;
-  font-family: var(--font-heading);
-  font-size: var(--text-lg);
-  font-weight: 600;
-  line-height: 1.2;
-  text-decoration: none;
-}
-.card__title::after {            /* makes the whole card the click target */
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius-card);
-}
-.card__title:focus-visible { outline: none; }
-.card:focus-within { outline: 3px solid var(--color-focus); outline-offset: 2px; }
-.card__desc {
-  display: block;
-  margin-top: var(--space-2);
-  font-size: var(--text-sm);
-  line-height: 1.45;
-  color: var(--color-ink-muted);
-}
-.card--planned {
-  background: transparent;
-  border-style: dashed;
-  box-shadow: none;
-  color: var(--color-ink-muted);
-}
-.card--planned::before { background: var(--color-card-edge); }
-.card--planned:hover { transform: none; box-shadow: none; }
-
-/* Badge: a small rounded label, e.g. "In progress" on a planned card.
-   Inside a card title it drops to its own line so every card lines up. */
-.badge {
-  display: inline-block;
-  margin-left: var(--space-2);
-  padding: 0 var(--space-2);
-  border: 1px solid var(--color-card-edge);
-  border-radius: 999px;
-  background: var(--color-paper-alt);
-  font-family: var(--font-ui);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  line-height: 1.6;
-  vertical-align: middle;
-  color: var(--color-ink-muted);
-}
-.card__title .badge {
-  display: table;                /* own line, but only as wide as its text */
-  margin: var(--space-1) 0 0;
 }
 
 /* Note: a short aside (caveats, limits). Left rule instead of a full box.
-   Used on Results and About. */
+   Used on Results. */
 .note {
   margin: var(--space-5) 0;
   padding: var(--space-3) var(--space-4);
@@ -926,30 +747,19 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
    5. PAGE TWEAKS
    ============================================================================= */
 
-/* Dashboard: the question headline gets a touch more room below. */
-.page--dashboard h1 { margin-bottom: var(--space-4); }
+/* Introduction: centred page title. */
+.page--intro h1 { text-align: center; }
+/* Introduction: the two "In Summary" lists sit in panels, so no extra gap at the top or bottom. */
+.page--intro .panel h3 { margin-top: 0; }
+.page--intro .panel ul { margin-bottom: 0; }
 
-/* About: centred page title. */
-.page--about h1 { text-align: center; }
-/* About: the two "In Summary" lists sit in panels, so no extra gap at the top or bottom. */
-.page--about .panel h3 { margin-top: 0; }
-.page--about .panel ul { margin-bottom: 0; }
-
-/* Phones: smaller page title and tokens so the strip fits without scrolling. */
+/* Phones: smaller page title and tokens. */
 @media (max-width: 34rem) {
   :root {
     --text-3xl: 2rem;
     --text-2xl: 1.6rem;
     --token-size: 1.85rem;
   }
-  /* Tighter strip so all 8 turns fit a ~360px screen without scrolling. */
-  .token-strip th,
-  .token-strip td { padding: 2px 1px; }
-  .token-strip th[scope="row"] {
-    padding-right: var(--space-1);
-    font-size: var(--text-xs);
-  }
-  .stats,
   .card-grid { grid-template-columns: 1fr; }
   .token { font-size: var(--text-xs); }
   .panel { padding: var(--space-3); }
@@ -958,10 +768,7 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
 
 /* People who ask their system for less motion: no lifting on hover. */
 @media (prefers-reduced-motion: reduce) {
-  .button,
-  .card { transition: none; }
-  .button:hover,
-  .card:hover,
-  .card:focus-within { transform: none; }
+  .button { transition: none; }
+  .button:hover { transform: none; }
   .button:disabled { transform: none; }
 }

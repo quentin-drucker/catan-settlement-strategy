@@ -79,7 +79,6 @@ python main.py experiments --games 100000 --seed 0
 
 GitHub Pages site, opening on the Introduction page:
 - **Introduction:** background, what the model includes, scoring, method
-- **Dashboard:** headline numbers, with cards linking to the other pages
 - **Watch:** two computer games on the same board, snake vs standard, step by step or Autoplay
 - **Play:** draft against three greedy computer players by clicking spots on the board
 - **Results:** charts and tables from the 100,000-game runs
