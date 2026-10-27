@@ -1,0 +1,165 @@
+<!doctype html>
+<!--
+  about.html: background and method (also the project's one-page background).
+  Key parts:
+  - background: Catan's opening, draft orders, the game-theory framing
+  - the model's rules
+  - scoring: dice-weight table drawn as Catan number tokens with pips
+  - experiments, limits, team and course, where the code lives
+  Sources: proposal, docs/experiments.md, src/board.py (dice weights).
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About | Catan Settlement Strategy</title>
+  <meta name="description" content="Background, rules and method of a simulation study of opening settlement drafts on a Catan board.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Site header (same on every page). -->
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="index.html">
+        <svg class="brand__mark" viewBox="0 0 26 30" aria-hidden="true"><polygon points="13,2 24,8.5 24,21.5 13,28 2,21.5 2,8.5"/></svg>
+        Catan Settlement Strategy
+      </a>
+      <nav class="nav" aria-label="Pages">
+        <a href="index.html">Dashboard</a>
+        <a href="results.html">Results</a>
+        <a href="about.html" aria-current="page">About</a>
+        <a href="https://github.com/quentin-drucker/catan-settlement-strategy">Code</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+
+    <h1>About the project</h1>
+    <p class="lede">
+      A study of one moment in <em>Settlers of Catan</em>: placing the first settlements.
+      Who gets the advantage, and does the order of picks balance it out?
+    </p>
+
+    <!-- Background: the topic, the draft-order question, and the game-theory framing. -->
+    <h2>Background</h2>
+    <p>
+      In <em>Settlers of Catan</em>, the board is a set of hexagonal tiles, each marked with a number
+      from 2 to 12. Every turn two dice are rolled, and every settlement next to a tile with that number
+      collects resources. Numbers near 7 come up most often: a 6 or an 8 can be rolled 5 ways out of
+      36, a 2 or a 12 only one way. The printed tokens show this with dots under the number.
+    </p>
+    <p>
+      Settlements sit on the corners where tiles meet, and two settlements may never be on neighbouring
+      corners. So the opening placements matter twice: a good corner pays off all game, and taking it
+      also removes it, and the corners next to it, from everyone who picks later.
+    </p>
+    <p>
+      That creates a first-mover problem. The player who places first gets the best corner on the board.
+      The official rules already respond to this with a snake order: first settlements go around the
+      table one way, and second settlements come back the other way, so the last player places twice in
+      a row. Fantasy sports drafts use the same idea for the same reason. Whether the snake actually
+      evens things out, and by how much, is an empirical question, and it is the question this project
+      measures.
+    </p>
+    <p>
+      In game-theory terms, the opening is a finite sequential game with perfect information: players
+      move one at a time, everyone sees every earlier move, and the set of legal moves (open corners)
+      shrinks after each placement. Each player's utility here is the expected production of their two
+      settlements. The game could in principle be solved by backward induction (working out the best move
+      from the last turn back to the first), but the number of possible move sequences is far too large to
+      search completely, so this project does not compute equilibrium play. Instead, every player follows
+      a simple greedy rule, taking the open corner worth the most right now, and the study measures how
+      outcomes differ by seat across many randomly generated boards.
+    </p>
+    <p>
+      The results are about fairness in practice, not about equilibria. A small gap between seats means
+      that, for these players, no seat is consistently better off. It does not prove the draft is fair for
+      every kind of player, and it is not a Nash equilibrium or price-of-anarchy result.
+    </p>
+
+    <!-- The model: what is and isn't simulated. -->
+    <h2>The model</h2>
+    <ul>
+      <li>Standard 19-tile board in rows of 3, 4, 5, 4 and 3, with 54 corners (settlement spots).</li>
+      <li>Standard number tokens: one each of 2 and 12, two each of 3 to 6 and 8 to 11, plus one desert tile with no number.</li>
+      <li>Four players, A to D, place two settlements each: eight placements in total.</li>
+      <li>A settlement can't go on a taken corner or on a corner directly next to one. The rule applies to everyone, including a player's own settlements.</li>
+      <li>Snake order: A B C D D C B A. Standard order: A B C D A B C D.</li>
+      <li>Two board types: <strong>random</strong> (tokens shuffled freely) and <strong>separated</strong> (reshuffled until no 6 or 8 touches another 6 or 8). Separated is the default.</li>
+      <li>Left out on purpose: roads, trading, development cards, resource types, the robber and dice rolling.</li>
+    </ul>
+
+    <!-- Scoring: dice weights as tokens; pips = ways to roll the number out of 36 (src/board.py). -->
+    <h2>Scoring</h2>
+    <p>
+      A corner's value is the sum of the dice weights of the tiles around it, where the dice weight of a
+      number is how many of the 36 two-dice rolls produce it. A player's payoff is the total value of
+      their two settlements.
+    </p>
+    <div class="table-wrap">
+      <table class="data-table data-table--compact">
+        <caption>Dice weight of each number token</caption>
+        <thead>
+          <tr><th scope="col">Token</th><th scope="col" class="num">Ways to roll (of 36)</th><th scope="col" class="num">Chance per roll</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="token">2<span class="token__pips" aria-hidden="true">&bull;</span></span></td><td class="num">1</td><td class="num">2.8%</td></tr>
+          <tr><td><span class="token">3<span class="token__pips" aria-hidden="true">&bull;&bull;</span></span></td><td class="num">2</td><td class="num">5.6%</td></tr>
+          <tr><td><span class="token">4<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;</span></span></td><td class="num">3</td><td class="num">8.3%</td></tr>
+          <tr><td><span class="token">5<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;&bull;</span></span></td><td class="num">4</td><td class="num">11.1%</td></tr>
+          <tr><td><span class="token token--high">6<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;&bull;&bull;</span></span></td><td class="num">5</td><td class="num">13.9%</td></tr>
+          <tr><td><span class="token token--high">8<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;&bull;&bull;</span></span></td><td class="num">5</td><td class="num">13.9%</td></tr>
+          <tr><td><span class="token">9<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;&bull;</span></span></td><td class="num">4</td><td class="num">11.1%</td></tr>
+          <tr><td><span class="token">10<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;</span></span></td><td class="num">3</td><td class="num">8.3%</td></tr>
+          <tr><td><span class="token">11<span class="token__pips" aria-hidden="true">&bull;&bull;</span></span></td><td class="num">2</td><td class="num">5.6%</td></tr>
+          <tr><td><span class="token">12<span class="token__pips" aria-hidden="true">&bull;</span></span></td><td class="num">1</td><td class="num">2.8%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Example: a corner touching an 8, a 5 and a 9 is worth 5 + 4 + 4 = 13, so it produces something on
+      13 of every 36 rolls on average. The desert counts as 0, and 7 has no tile.
+    </p>
+
+    <!-- Experiments: setups + measures (summary of docs/experiments.md). -->
+    <h2>How the experiments work</h2>
+    <ul>
+      <li>Four setups: snake or standard draft, on separated or random boards. 100,000 games each.</li>
+      <li>Game number <em>i</em> uses random seed <em>i</em> in every setup. The board depends only on the seed and the board type, so snake and standard play exactly the same boards, and the draft order is the only difference.</li>
+      <li>Greedy players break ties between equally good corners at random, with a seeded generator, so every game can be replayed exactly.</li>
+      <li>Measures: average payoff per seat with a 95% confidence interval, the fairness gap (best seat average minus worst), the average best-minus-worst spread inside a game, win share (ties split evenly), the value of each seat's first and second pick, and how often each corner is taken.</li>
+    </ul>
+
+    <!-- Limits (same caveat as the Results page). -->
+    <div class="note">
+      <p><strong>Limits.</strong> Greedy players only look one move ahead and never block on purpose.
+        An optional extension of the project tests a player that also weighs the corners it takes away
+        from opponents.</p>
+    </div>
+
+    <!-- Team, course and code. -->
+    <h2>Team and course</h2>
+    <p>
+      Quentin Drucker and Emmett Manning, COM313 Algorithmic Game Theory, taught by Professor Christine Chung.
+    </p>
+    <p>
+      The simulation is written in Python. The <a href="https://github.com/quentin-drucker/catan-settlement-strategy">source
+      code</a> includes the board model, the game rules, the computer players, the simulations, the analysis
+      that produced every number on this site, and the automated tests.
+    </p>
+  </main>
+
+  <!-- Footer (same on every page). -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>Quentin Drucker and Emmett Manning, COM313 Algorithmic Game Theory, Prof. Christine Chung</p>
+      <p><a href="https://github.com/quentin-drucker/catan-settlement-strategy">Source code on GitHub</a></p>
+      <p>Rebuild every number with <code>python main.py experiments --games 100000</code></p>
+    </div>
+  </footer>
+</body>
+</html>

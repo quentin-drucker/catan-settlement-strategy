@@ -1,0 +1,64 @@
+# pages.yml: publish the project website to GitHub Pages.
+#
+# A "workflow" = a list of steps GitHub runs on its own computers when something
+# happens in the repo (here: a push to main). This one:
+#   1. builds _site/ with site/build_site.py (pages + charts in one folder)
+#   2. uploads _site/ as the Pages "artifact" (= the packaged files to publish)
+#   3. deploys it to https://quentin-drucker.github.io/catan-settlement-strategy/
+#
+# One-time setup: repo Settings -> Pages -> Source: "GitHub Actions".
+
+name: Deploy website
+
+on:
+  push:
+    branches: [main]      # every merge to main updates the site
+  workflow_dispatch:      # also allows a manual run from the Actions tab
+
+# Minimum permissions Pages needs: read the code, write the deployment,
+# and an identity token that proves the deploy comes from this repo.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# If two pushes land close together, finish the running deploy instead of
+# cancelling it halfway, then run the next one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Get a copy of the repository onto the runner.
+      - uses: actions/checkout@v4
+
+      # Python is needed to run the build script (standard library only, no installs).
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Copy site/ + results charts into _site/.
+      - name: Build site folder
+        run: python site/build_site.py
+
+      # Tell Pages this repo deploys from a workflow (reads the repo's Pages settings).
+      - uses: actions/configure-pages@v5
+
+      # Package _site/ for the deploy job.
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build          # only deploy if the build succeeded
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}   # shows the live link on the run page
+    steps:
+      # Publish the uploaded artifact as the live site.
+      - id: deployment
+        uses: actions/deploy-pages@v4

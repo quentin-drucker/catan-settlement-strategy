@@ -166,8 +166,7 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
-# mkdocs/Zensical documentation
-/site
+# mkdocs/Zensical documentation: /site rule removed, site/ holds this project's website
 
 # mypy
 .mypy_cache/
@@ -224,3 +223,8 @@ results/raw/
 
 # Local comment/docs style reference (not shared)
 COMMENT_STYLE.md
+
+_site/
+
+# Local style previews (generated, not shared)
+theme-previews/
