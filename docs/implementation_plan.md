@@ -91,7 +91,6 @@ Pages:
 - **Results**: the 100,000-game findings: headline table, the 5 charts, short explanations
   (content from `docs/experiments.md` and `results/summary.md`).
 - **Introduction** (`index.html`, home page; was "About"): background on the topic (course needs >= 1 page), what the model includes, scoring, method.
-  (The Dashboard page was removed: it repeated the Introduction and simplified the Results charts.)
 - **Strategies** (only if Issue #6 is done): blocking CPU vs greedy. No menu link until it exists.
 
 How the game runs in the browser:
