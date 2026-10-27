@@ -14,7 +14,7 @@ and the commands to test it yourself.
 | 2 | #2 Placement rules + scoring | **Done** – `src/game.py`, `src/player.py`, `tests/test_game.py` (39 tests; 63 in total) |
 | 3 | #3 Greedy CPU + draft | **Done** – `src/strategies.py`, `src/game.py`, `python main.py play` (123 tests in total) |
 | 4 | #4 Simulations + fairness analysis | **Done** – `src/simulation.py`, `src/analysis.py`, `python main.py experiments` (132 tests in total) |
-| 5 | #5 Interactive website (GitHub Pages): play + watch games in the browser | **In progress** – step 1 done: Dashboard, Results, About, deploy workflow (replaces the Pygame plan) |
+| 5 | #5 Interactive website (GitHub Pages): play + watch games in the browser | **Done** – Dashboard, Watch, Play, Results, About + deploy workflow (replaces the Pygame plan) |
 | 6 | #6 Blocking-aware CPU (optional) | Not started |
 | – | Terminal board view (backup to the website) | **Done** – `src/text_view.py`; `play --step`, `play --human A`, `explore` |
 | – | README, docs, `main.py` CLI | README written (install, usage, layout); grows with each step |
@@ -121,8 +121,15 @@ Build order (each step leaves a working site):
    - Polish pass: parchment page texture (CSS-drawn, no image files), centred folder-tab
      navigation, buttons, framed card-stock panels for charts/tables, stat tiles, clickable
      Explore cards, one hex ornament per page. Charts sit on the same card colour.
-2. Watch page (Pyodide + SVG board).
-3. Play page (same board drawing + clicks).
+2. Watch page (Pyodide + SVG board). **Done.**
+3. Play page (same board drawing + clicks). **Done.**
+   - `src/web.py` = bridge: `new` / `step` / `place` / `greedy_payoff`, all returning JSON;
+     `place` refuses moves on a computer's turn. Tested in `tests/test_web.py`.
+   - `site/js/engine.js` loads Pyodide 0.27.7 (Python 3.12) from a CDN + the engine files;
+     `board.js` draws the SVG board; `watch.js` / `play.js` run the pages.
+   - `build_site.py` copies the engine files into `_site/src/`.
+   - Checked in a browser: Watch matches `python main.py play` move for move (seed 42);
+     Play works with mouse and keyboard; no console errors; desktop + phone.
 4. Strategies page if Issue #6 happens.
 
 Checks: Python tests still cover all game logic; each page opened in a browser and checked

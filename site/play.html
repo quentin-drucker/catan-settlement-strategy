@@ -1,0 +1,134 @@
+<!doctype html>
+<!--
+  play.html: draft against three greedy computer players.
+  Key parts:
+  - controls: your seat, draft order, board type, seed, show values, New game
+  - status line: whose turn, what to do, why a pick was refused, final result
+  - the board (open spots are clickable on your turn), scoreboard and move log
+  The game runs in the browser: js/engine.js loads the Python engine (src/*.py)
+  with Pyodide; js/board.js draws the board; js/play.js runs this page.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Play | Catan Settlement Strategy</title>
+  <meta name="description" content="Draft settlement spots on a Catan board against three greedy computer players.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/play.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Site header (same on every page). -->
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="index.html">
+        <svg class="brand__mark" viewBox="0 0 26 30" aria-hidden="true"><polygon points="13,2 24,8.5 24,21.5 13,28 2,21.5 2,8.5"/></svg>
+        Catan Settlement Strategy
+      </a>
+      <nav class="nav" aria-label="Pages">
+        <a href="index.html">Dashboard</a>
+        <a href="watch.html">Watch</a>
+        <a href="play.html" aria-current="page">Play</a>
+        <a href="results.html">Results</a>
+        <a href="about.html">About</a>
+        <a href="https://github.com/quentin-drucker/catan-settlement-strategy">Source code</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+
+    <!-- Intro: the rules in two sentences. -->
+    <h1>Play</h1>
+    <p class="lede">
+      Pick two settlement spots against three greedy computer players. A spot is worth the dice
+      weights of the tiles around it, and no spot may sit right next to a settlement.
+    </p>
+    <div class="ornament" aria-hidden="true"><span class="ornament__hex"></span></div>
+
+    <!-- Controls. Changing seat, draft, board or seed starts a new game. -->
+    <div class="controls wide">
+      <label class="field">
+        <span class="field__label">Your seat</span>
+        <select class="field__input" id="play-seat" disabled data-needs-engine>
+          <option value="A" selected>A (picks first)</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D (picks fourth)</option>
+        </select>
+      </label>
+      <label class="field">
+        <span class="field__label">Draft</span>
+        <select class="field__input" id="play-draft" disabled data-needs-engine>
+          <option value="snake" selected>Snake (A B C D D C B A)</option>
+          <option value="standard">Standard (A B C D A B C D)</option>
+        </select>
+      </label>
+      <label class="field">
+        <span class="field__label">Board</span>
+        <select class="field__input" id="play-board" disabled data-needs-engine>
+          <option value="separated" selected>Separated (no 6/8 together)</option>
+          <option value="random">Random</option>
+        </select>
+      </label>
+      <label class="field">
+        <span class="field__label">Seed</span>
+        <input class="field__input field__input--short" id="play-seed" type="number" min="0" step="1" placeholder="random" disabled data-needs-engine>
+      </label>
+      <label class="field field--check">
+        <input id="play-values" type="checkbox" disabled data-needs-engine>
+        <span>Show spot values</span>
+      </label>
+      <button class="button button--primary" id="play-new" type="button" disabled data-needs-engine>New game</button>
+    </div>
+
+    <!-- Status: read out by screen readers when it changes (aria-live). -->
+    <p class="status wide" id="play-status" aria-live="polite">
+      Loading the Python game engine. The first visit downloads about 12 MB, so it can take a few seconds.
+    </p>
+
+    <!-- The game: board on the left, scores and log on the right (stacked on phones). -->
+    <div class="board-pair wide">
+      <section class="panel board-panel" aria-labelledby="play-title">
+        <h2 class="board-panel__title" id="play-title">Board</h2>
+        <p class="board-panel__turn" id="play-turn"></p>
+        <svg id="play-board-svg" tabindex="-1"></svg>
+      </section>
+      <section class="panel board-panel" aria-labelledby="play-scores-title">
+        <h2 class="board-panel__title" id="play-scores-title">Scores</h2>
+        <div class="table-wrap">
+          <table class="data-table data-table--compact">
+            <thead><tr><th scope="col">Seat</th><th scope="col">Player</th><th scope="col">Spots (value)</th><th scope="col" class="num">Payoff</th></tr></thead>
+            <tbody id="play-scores"></tbody>
+          </table>
+        </div>
+        <h3>Moves</h3>
+        <ol class="move-log" id="play-log"></ol>
+      </section>
+    </div>
+
+    <!-- Tips. -->
+    <h2>Tips</h2>
+    <ul>
+      <li>Hover over a spot (or turn on "Show spot values") to see what it's worth: tiles 8, 5 and 9 make 5 + 4 + 4 = 13.</li>
+      <li>Taking a spot also blocks its neighbours for everyone, including you. Blocking a strong spot an opponent wants can pay off.</li>
+      <li>Keyboard: Tab moves between open spots on your turn; Enter or Space picks one.</li>
+      <li>The seed is shown above the board; the same seed always gives the same board. Computer moves can
+        differ from a computer-only game once you pick, because ties between equal spots are broken in a
+        different order.</li>
+    </ul>
+  </main>
+
+  <!-- Footer (same on every page). -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>Quentin Drucker and Emmett Manning, COM313 Algorithmic Game Theory, Prof. Christine Chung</p>
+      <p><a href="https://github.com/quentin-drucker/catan-settlement-strategy">Source code on GitHub</a></p>
+      <p>Rebuild every number with <code>python main.py experiments --games 100000</code></p>
+    </div>
+  </footer>
+</body>
+</html>
