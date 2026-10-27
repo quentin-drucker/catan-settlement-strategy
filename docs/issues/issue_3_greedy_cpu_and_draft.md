@@ -39,7 +39,7 @@
   which Issue #4 needs to compare the two fairly. The CPUs share one tie-break generator
   seeded with the same seed, so the same seed always replays the identical game.
 - **Board mode.** Boards default to `separated` (no 6 or 8 next to another 6 or 8), as
-  set by Emmett in PR #9. Use `--board random` to allow them to touch.
+  set in PR #9. Use `--board random` to allow them to touch.
 
 ## How to test it yourself
 

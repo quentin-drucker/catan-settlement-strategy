@@ -113,7 +113,7 @@ Charts and demos to build once the simulations exist (Step 4 onward):
 
 ## Decisions needing team approval
 
-1. **Default board mode:** `separated` (decided by Emmett, PR #9).
+1. **Default board mode:** `separated` (set in PR #9).
 2. **Desert placement:** random hex (like real Catan), not always the centre.
 3. **Tie-break seeding:** tie-break RNG seeded from the game seed, independent of the board.
 4. **Win rate with ties:** split credit (`1/k` to each of `k` tied players).
