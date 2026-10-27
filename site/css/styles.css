@@ -931,6 +931,9 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
 
 /* About: centred page title. */
 .page--about h1 { text-align: center; }
+/* About: the two "In Summary" lists sit in panels, so no extra gap at the top or bottom. */
+.page--about .panel h3 { margin-top: 0; }
+.page--about .panel ul { margin-bottom: 0; }
 
 /* Phones: smaller page title and tokens so the strip fits without scrolling. */
 @media (max-width: 34rem) {

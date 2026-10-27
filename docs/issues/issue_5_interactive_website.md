@@ -7,10 +7,11 @@ Live: https://quentin-drucker.github.io/catan-settlement-strategy/
 
 | File | Purpose |
 |---|---|
-| `site/index.html` | Dashboard: question + answer, token strip, headline numbers, cards to every page |
+| `site/index.html` | Introduction (home page): background, what the model includes, scoring, method |
+| `site/dashboard.html` | Dashboard: question + answer, token strip, headline numbers, cards to every page |
 | `site/watch.html` + `site/js/watch.js` | Two computer games on the same board, snake vs standard, step by step |
 | `site/play.html` + `site/js/play.js` | One human seat against three greedy computer players |
-| `site/results.html`, `site/about.html` | Charts/tables from the 100,000-game runs; background and method |
+| `site/results.html` | Charts/tables from the 100,000-game runs |
 | `site/js/engine.js` | Loads the Python engine into the browser (Pyodide) |
 | `site/js/board.js` | Draws the board as SVG (tiles, tokens with pips, spots, house pieces) |
 | `src/web.py` + `tests/test_web.py` | Bridge between the pages and the engine (JSON in/out) |
