@@ -13,7 +13,7 @@ and the commands to test it yourself.
 | 1 | #1 Board representation | **Done** – `src/board.py`, `tests/test_board.py` (24 tests passing) |
 | 2 | #2 Placement rules + scoring | **Done** – `src/game.py`, `src/player.py`, `tests/test_game.py` (39 tests; 63 in total) |
 | 3 | #3 Greedy CPU + draft | **Done** – `src/strategies.py`, `src/game.py`, `python main.py play` (123 tests in total) |
-| 4 | #4 Simulations + fairness analysis | Not started |
+| 4 | #4 Simulations + fairness analysis | **Done** – `src/simulation.py`, `src/analysis.py`, `python main.py experiments` (132 tests in total) |
 | 5 | #5 Pygame interactive mode | Not started |
 | 6 | #6 Blocking-aware CPU (optional) | Not started |
 | – | Terminal board view (backup to the Pygame window) | **Done** – `src/text_view.py`; `play --step`, `play --human A`, `explore` |
@@ -60,7 +60,7 @@ and the commands to test it yourself.
   `--human A` = a person plays seat A. Inspect in the terminal view is now `i 22`.
 - Measured: ~1.4 ms per full game, so 10,000 games take about 15 s.
 
-## Step 4 – Simulations and fairness (`src/simulation.py`, `src/analysis.py`)
+## Step 4 – Simulations and fairness (done)
 
 - Each game comes from `new_game(seed, board_mode, draft)` (Step 3), so the same seed gives
   the **same board under both draft formats** (Experiment 2 isolation).
@@ -68,12 +68,16 @@ and the commands to test it yourself.
   replayed with `main.py play --seed`.
 - CSV, one row per (game, player): `sim_id, seed, board_mode, draft, player, strategy,
   settlement_1, value_1, settlement_2, value_2, payoff, win_share` (ties split 1/k).
-- Summary per configuration: mean ± 95% CI by position, per-position std, fairness gap
-  (max mean − min mean), mean within-game spread (max − min payoff), win share.
-- Experiments (one command, fixed base seed): 1) snake/random by position;
-  2) snake vs standard on identical seeds; 3) random vs separated boards under snake.
-  Output: `results/summary.md` + one labelled Matplotlib PNG per experiment; raw CSVs go
-  to `results/raw/` (git-ignored).
+- CSV rows are streamed to disk as games finish -> 100,000+ games don't need to fit in memory.
+- `summarize(csv)` re-reads a CSV: mean ± 95% CI per seat, std, 1st/2nd pick value, win share,
+  fairness gap (max mean − min mean), mean within-game spread (max − min payoff), vertex
+  pick counts. `paired_spread_difference` compares snake vs standard game-by-game on the same seeds.
+- `run_experiments(n, seed, out)`: 4 setups (snake/standard × separated/random), then
+  `results/summary.md` + 5 charts: `seat_payoffs`, `pick_values`, `fairness`, `win_share`,
+  `heatmap`. Raw CSVs go to `results/raw/` (git-ignored).
+- Final run: 100,000 games per setup (seeds 0–99,999). Design + findings in `docs/experiments.md`.
+- Box plot of payoff spread dropped: payoffs are whole numbers, so the boxes collapse;
+  replaced by win share per seat.
 
 ## Step 5 – Pygame interactive mode (`src/visualization.py`)
 
@@ -102,7 +106,7 @@ Charts and demos to build once the simulations exist (Step 4 onward):
 - **First vs second pick value by seat.** Explains the snake trade-off (A gets the best
   first pick but the worst second pick).
 - **Fairness gap table:** snake/standard × random/separated boards.
-- **Payoff spread per seat** (box plot): balanced averages can still hide luck.
+- **Win share per seat** (replaced the box plot): balanced averages can still hide who actually wins.
 - **Live demo:** human vs three greedy CPUs in the Pygame window (Step 5).
 - **Optional:** blocking CPU vs greedy, payoff gain by seat (Step 6).
 - **Docs:** README (install, run, reproduce), one-page background, architecture diagram.

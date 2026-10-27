@@ -44,8 +44,9 @@ python -m pip install -r requirements.txt
 | `python main.py play --seed 42 --step` | Board shown after every move; Enter = next move |
 | `python main.py play --seed 42 --human A` | Play seat A against three CPUs in the terminal |
 | `python main.py explore --seed 42` | Every settlement placed by hand (all seats human) |
+| `python main.py experiments --games 100000` | Simulate all 4 setups -> `results/summary.md` + charts |
 
-Options (both commands):
+Options (`play` / `explore`):
 - `--seed N`: same seed -> same board and same game. Left out -> random seed, printed at the top.
 - `--board separated|random`: `separated` (default) = no 6 or 8 next to another 6 or 8.
 - `--draft snake|standard`: `snake` is the default.
@@ -58,7 +59,23 @@ Terminal view commands:
 - `r` -> restart the same game
 - `q` -> quit
 
-Still to come: batch simulations + fairness charts (Issue #4) and a Pygame window (Issue #5).
+## Experiments
+
+```
+python main.py experiments --games 100000 --seed 0
+```
+
+- 4 setups: snake / standard draft x separated / random boards, 4 greedy CPUs.
+- Game `i` uses seed `seed + i` -> same boards across drafts; any game can be replayed with
+  `python main.py play --seed <seed> --board <mode> --draft <draft>`.
+- Output:
+  - `results/summary.md`: tables per setup + comparisons
+  - `results/*.png`: charts (seat payoffs, pick values, fairness, win share, board heatmap)
+  - `results/raw/*.csv`: one row per player per game (large, git-ignored)
+- 100,000 games per setup takes a few minutes. `--games 10000` is enough for a quick look.
+- Design + findings: [docs/experiments.md](docs/experiments.md).
+
+Still to come: a Pygame window (Issue #5).
 
 ## Tests
 
@@ -74,10 +91,12 @@ src/board.py         hex board, vertex graph, dice weights, board generation
 src/game.py          game controller: draft order, turns, placement rules, payoffs
 src/player.py        player + their settlements
 src/strategies.py    CPU strategies (greedy)
+src/simulation.py    batch games -> CSV
+src/analysis.py      statistics, report, charts
 src/text_view.py     terminal board view
 tests/               pytest suite
 docs/                implementation plan + per-issue testing guides
-results/             simulation output (Issue #4)
+results/             summary.md + charts (raw CSVs in results/raw/, git-ignored)
 ```
 
 More detail:
