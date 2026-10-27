@@ -1,28 +1,26 @@
 <!doctype html>
 <!--
-  index.html: the dashboard (home page of the project website).
+  index.html: the introduction (home page of the project website): background and method.
   Key parts:
-  - the research question + one-paragraph answer
-  - the token strip: the 8 greedy picks and who gets each under snake vs standard
-  - headline numbers (stat row)
-  - buttons to the main pages + cards linking to every page
-  All numbers come from results/summary.md (100,000 games per setup).
-  All styling lives in css/styles.css.
+  - background: Catan's opening, draft orders, the game-theory framing
+  - in summary: what the model does and doesn't include, side by side
+  - scoring: dice-weight table drawn as Catan number tokens with pips
+  - additional information: setups, seeds, tie-breaks, limits
+  Sources: proposal, docs/experiments.md, src/board.py (dice weights).
 -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Catan Settlement Strategy</title>
-  <meta name="description" content="Does a snake draft cancel out the advantage of picking first? A simulation study of opening settlement placement on a Catan board.">
+  <title>Introduction | Catan Settlement Strategy</title>
+  <meta name="description" content="Background, rules and method of a simulation study of opening settlement drafts on a Catan board.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <!-- Site header: brand (links home) + page links. Same block on every page;
-       aria-current marks the page being viewed. -->
+  <!-- Site header (same on every page). -->
   <header class="site-header">
     <div class="site-header__inner">
       <a class="brand" href="index.html">
@@ -30,134 +28,119 @@
         Catan Settlement Strategy
       </a>
       <nav class="nav" aria-label="Pages">
-        <a href="index.html" aria-current="page">Dashboard</a>
+        <a href="index.html" aria-current="page">Introduction</a>
+        <a href="dashboard.html">Dashboard</a>
         <a href="watch.html">Watch</a>
         <a href="play.html">Play</a>
         <a href="results.html">Results</a>
-        <a href="about.html">About</a>
         <a href="https://github.com/quentin-drucker/catan-settlement-strategy">Source code</a>
       </nav>
     </div>
   </header>
 
-  <main id="main" class="page page--dashboard">
+  <main id="main" class="page page--about">
 
-    <!-- Question + answer: the whole project in two sentences. -->
-    <h1>Does a snake draft cancel out the advantage of picking first?</h1>
+    <h1>About the project</h1>
     <p class="lede">
-      Mostly. Four computer players each draft two settlement spots on a Catan board.
-      Over 100,000 games, the snake order (A B C D D C B A) shrinks the gap between the
-      best and worst seat from 3.64 points under the standard order to 0.19.
+      This project is a study of initial settlement placement in the game Settlers of Catan, where our
+      goal is to determine the 'fairness' of each seat in the placement draft and to what extent
+      different draft types affect this metric.
     </p>
-    <!-- Main actions: the results, and the two pages that run the game in the browser. -->
-    <div class="button-row">
-      <a class="button button--primary" href="results.html">See the results</a>
-      <a class="button button--secondary" href="watch.html">Watch a game</a>
-      <a class="button button--secondary" href="play.html">Play</a>
-    </div>
     <div class="ornament" aria-hidden="true"><span class="ornament__hex"></span></div>
 
-    <!-- Token strip: average value of each pick in turn order (separated boards),
-         from the "1st/2nd pick value" columns in results/summary.md. -->
-    <h2>Same picks, different owners</h2>
+    <!-- Background: the topic, the draft-order question, and the game-theory framing. -->
+    <h2>Background</h2>
     <p>
-      With greedy players, both drafts take the same eight spots in the same order.
-      The draft only decides who gets each one. Snake hands the weaker second-round
-      picks back to the seats that picked first.
+      In Settlers of Catan the board is a set of hexagonal tiles, each marked with a number from 2 to 12
+      but excluding 7. Every turn two dice are rolled, and every settlement next to a tile with that
+      number collects resources. Numbers near 7 come up most often: a 6 or an 8 can each be rolled 5 ways
+      out of 36, a 2 or a 12 only one way. The printed tokens show this with dots under the number
+      representing their probabilities.
     </p>
-    <div class="token-strip-wrap panel wide">
-      <table class="token-strip">
-        <caption class="byline">Average value of each pick, 100,000 games per draft on separated boards.
-          Value = sum of the dice weights around the spot.</caption>
+    <p>
+      Settlements sit on the corners where tiles meet, and two settlements may never be on neighbouring
+      corners, occupy the same corner, or be moved/destroyed; so the opening placement matters a lot for
+      each player's game trajectory. The order of the opening placement is decided with a single dice
+      roll from each player, usually played where the highest roll goes first.
+    </p>
+    <p>
+      That creates a problem where the player who places first gets the best spot on the board. The
+      official rules already respond to this with something called a “snake draft”, which is effective
+      because each player must place two settlements. A snake draft dictates the initial highest first
+      order happens first, and then its inverse happens. So, the player who places first also places
+      last, and the player who rolled the lowest starting number places both of their settlements at the
+      same time.
+    </p>
+    <p>
+      In game-theory terms, the opening is a finite sequential game with perfect information. Players
+      move one at a time with everyone seeing every earlier move and the set of legal moves shrinks after
+      each placement. So in our game, which is limited to just the opening placements, each player's
+      payoff is the sum total of the tiles’ probabilities (out of 36) that their settlements lie on.
+      We assume every player follows a simple greedy rule, taking the highest-value open spot every turn.
+    </p>
+
+    <!-- In summary: what the simulation does and doesn't include, side by side. -->
+    <h2>In Summary</h2>
+    <div class="card-grid">
+      <div class="panel">
+        <h3>We consider</h3>
+        <ul>
+          <li>The whole, classic, 19 tile Catan board with 54 possible settlement spots.</li>
+          <li>The standard number tokens, one each of 2 and 12 and two of all others excluding 7.</li>
+          <li>Four players and their two settlements each.</li>
+          <li>That settlements may not occupy adjacent corners.</li>
+          <li>The snake draft (A B C D D C B A) and standard order draft (A B C D A B C D).</li>
+          <li>The ‘true random’ board type and the ‘traditional separated’ board type.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>We do not consider</h3>
+        <ul>
+          <li>Roads attached to settlements.</li>
+          <li>Resources associated with each tile.</li>
+          <li>Trading resource cards between players.</li>
+          <li>Exchanging resources at ports/with the bank.</li>
+          <li>Development cards.</li>
+          <li>The robber and other actions associated with rolling a 7.</li>
+          <li>The overall trajectory that consistent random dice rolls lead the game to have.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Scoring: dice weights as tokens; pips = ways to roll the number out of 36 (src/board.py). -->
+    <h2>Scoring</h2>
+    <div class="table-wrap panel">
+      <table class="data-table data-table--compact">
+        <caption>Dice weight of each number token</caption>
+        <thead>
+          <tr><th scope="col">Token</th><th scope="col" class="num">Ways to roll (of 36)</th><th scope="col" class="num">Chance per roll</th></tr>
+        </thead>
         <tbody>
-          <tr>
-            <th scope="row">Turn</th>
-            <td class="token-strip__turn">1</td><td class="token-strip__turn">2</td>
-            <td class="token-strip__turn">3</td><td class="token-strip__turn">4</td>
-            <td class="token-strip__turn">5</td><td class="token-strip__turn">6</td>
-            <td class="token-strip__turn">7</td><td class="token-strip__turn">8</td>
-          </tr>
-          <tr>
-            <th scope="row">Pick value</th>
-            <td><span class="token">12.5</span></td>
-            <td><span class="token">11.8</span></td>
-            <td><span class="token">11.1</span></td>
-            <td><span class="token">10.6</span></td>
-            <td><span class="token token--late">10.0</span></td>
-            <td><span class="token token--late">9.4</span></td>
-            <td><span class="token token--late">8.8</span></td>
-            <td><span class="token token--late">8.2</span></td>
-          </tr>
-          <tr class="token-strip__divider">
-            <th scope="row">Snake</th>
-            <td class="token-strip__owner token-strip__owner--snake">A</td>
-            <td class="token-strip__owner token-strip__owner--snake">B</td>
-            <td class="token-strip__owner token-strip__owner--snake">C</td>
-            <td class="token-strip__owner token-strip__owner--snake">D</td>
-            <td class="token-strip__owner token-strip__owner--snake">D</td>
-            <td class="token-strip__owner token-strip__owner--snake">C</td>
-            <td class="token-strip__owner token-strip__owner--snake">B</td>
-            <td class="token-strip__owner token-strip__owner--snake">A</td>
-          </tr>
-          <tr>
-            <th scope="row">Standard</th>
-            <td class="token-strip__owner token-strip__owner--standard">A</td>
-            <td class="token-strip__owner token-strip__owner--standard">B</td>
-            <td class="token-strip__owner token-strip__owner--standard">C</td>
-            <td class="token-strip__owner token-strip__owner--standard">D</td>
-            <td class="token-strip__owner token-strip__owner--standard">A</td>
-            <td class="token-strip__owner token-strip__owner--standard">B</td>
-            <td class="token-strip__owner token-strip__owner--standard">C</td>
-            <td class="token-strip__owner token-strip__owner--standard">D</td>
-          </tr>
+          <tr><td><span class="token">2<span class="token__pips" aria-hidden="true">&bull;</span></span></td><td class="num">1</td><td class="num">2.8%</td></tr>
+          <tr><td><span class="token">3<span class="token__pips" aria-hidden="true">&bull;&bull;</span></span></td><td class="num">2</td><td class="num">5.6%</td></tr>
+          <tr><td><span class="token">4<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;</span></span></td><td class="num">3</td><td class="num">8.3%</td></tr>
+          <tr><td><span class="token">5<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;&bull;</span></span></td><td class="num">4</td><td class="num">11.1%</td></tr>
+          <tr><td><span class="token token--high">6<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;&bull;&bull;</span></span></td><td class="num">5</td><td class="num">13.9%</td></tr>
+          <tr><td><span class="token token--high">8<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;&bull;&bull;</span></span></td><td class="num">5</td><td class="num">13.9%</td></tr>
+          <tr><td><span class="token">9<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;&bull;</span></span></td><td class="num">4</td><td class="num">11.1%</td></tr>
+          <tr><td><span class="token">10<span class="token__pips" aria-hidden="true">&bull;&bull;&bull;</span></span></td><td class="num">3</td><td class="num">8.3%</td></tr>
+          <tr><td><span class="token">11<span class="token__pips" aria-hidden="true">&bull;&bull;</span></span></td><td class="num">2</td><td class="num">5.6%</td></tr>
+          <tr><td><span class="token">12<span class="token__pips" aria-hidden="true">&bull;</span></span></td><td class="num">1</td><td class="num">2.8%</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Headline numbers: 4 stat tiles from results/summary.md. -->
-    <h2>Results at a glance</h2>
-    <ul class="stats">
-      <li class="stat">
-        <span class="stat__value stat__value--snake">0.19</span>
-        <span class="stat__label">points between the best and worst seat on average, snake draft</span>
-      </li>
-      <li class="stat">
-        <span class="stat__value stat__value--standard">3.64</span>
-        <span class="stat__label">points between the best and worst seat, standard draft</span>
-      </li>
-      <li class="stat">
-        <span class="stat__value stat__value--standard">90%</span>
-        <span class="stat__label">of standard-draft games won by seat A (ties split)</span>
-      </li>
-      <li class="stat">
-        <span class="stat__value">4&times;</span>
-        <span class="stat__label">smaller snake gap when 6s and 8s are kept apart (0.88 to 0.19)</span>
-      </li>
-    </ul>
-
-    <!-- Cards linking to every page. -->
-    <h2>Explore</h2>
-    <ul class="card-grid">
-      <li class="card">
-        <a class="card__title" href="results.html">Results</a>
-        <span class="card__desc">Charts and tables from 400,000 simulated games, including a heatmap of where players settle.</span>
-      </li>
-      <li class="card">
-        <a class="card__title" href="about.html">About</a>
-        <span class="card__desc">Background, the rules of the model, how spots are scored, and how the experiments work.</span>
-      </li>
-      <li class="card">
-        <a class="card__title" href="watch.html">Watch a game</a>
-        <span class="card__desc">Step through a computer game move by move, snake and standard side by side on the same board.</span>
-      </li>
-      <li class="card">
-        <a class="card__title" href="play.html">Play</a>
-        <span class="card__desc">Draft two settlement spots against three computer players, right in the browser.</span>
-      </li>
+    <!-- Additional information: setups, seeds, tie-breaks, limits. -->
+    <h2>Additional Information</h2>
+    <ul>
+      <li>Four different setups are run, snake draft and standard draft on both 'true random' and 'traditional separated' board types.</li>
+      <li>Each game "i" uses the seed "i", meaning that our results are replicable and the snake and standard drafts are played on exactly the same boards, so the draft order is the only difference between them.</li>
+      <li>Greedy players will break ties between same-value spots at random, but that random number is calculated from the seed so this is repeatable as well.</li>
+      <li>Strategy is limited by the greedy nature of CPU players, they will not strategically block other players as an actual Catan player might.</li>
     </ul>
   </main>
 
-  <!-- Footer: team + course, source code, where the numbers come from. Same on every page. -->
+  <!-- Footer (same on every page). -->
   <footer class="site-footer">
     <div class="site-footer__inner">
       <p>Quentin Drucker and Emmett Manning, COM313 Algorithmic Game Theory, Prof. Christine Chung</p>

@@ -1,0 +1,169 @@
+<!doctype html>
+<!--
+  dashboard.html: the dashboard (headline results of the project website).
+  Key parts:
+  - the research question + one-paragraph answer
+  - the token strip: the 8 greedy picks and who gets each under snake vs standard
+  - headline numbers (stat row)
+  - buttons to the main pages + cards linking to every page
+  All numbers come from results/summary.md (100,000 games per setup).
+  All styling lives in css/styles.css.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catan Settlement Strategy</title>
+  <meta name="description" content="Does a snake draft cancel out the advantage of picking first? A simulation study of opening settlement placement on a Catan board.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Site header: brand (links home) + page links. Same block on every page;
+       aria-current marks the page being viewed. -->
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="index.html">
+        <svg class="brand__mark" viewBox="0 0 26 30" aria-hidden="true"><polygon points="13,2 24,8.5 24,21.5 13,28 2,21.5 2,8.5"/></svg>
+        Catan Settlement Strategy
+      </a>
+      <nav class="nav" aria-label="Pages">
+        <a href="index.html">Introduction</a>
+        <a href="dashboard.html" aria-current="page">Dashboard</a>
+        <a href="watch.html">Watch</a>
+        <a href="play.html">Play</a>
+        <a href="results.html">Results</a>
+        <a href="https://github.com/quentin-drucker/catan-settlement-strategy">Source code</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="page page--dashboard">
+
+    <!-- Question + answer: the whole project in two sentences. -->
+    <h1>Does a snake draft cancel out the advantage of picking first?</h1>
+    <p class="lede">
+      Mostly. Four computer players each draft two settlement spots on a Catan board.
+      Over 100,000 games, the snake order (A B C D D C B A) shrinks the gap between the
+      best and worst seat from 3.64 points under the standard order to 0.19.
+    </p>
+    <!-- Main actions: the results, and the two pages that run the game in the browser. -->
+    <div class="button-row">
+      <a class="button button--primary" href="results.html">See the results</a>
+      <a class="button button--secondary" href="watch.html">Watch a game</a>
+      <a class="button button--secondary" href="play.html">Play</a>
+    </div>
+    <div class="ornament" aria-hidden="true"><span class="ornament__hex"></span></div>
+
+    <!-- Token strip: average value of each pick in turn order (separated boards),
+         from the "1st/2nd pick value" columns in results/summary.md. -->
+    <h2>Same picks, different owners</h2>
+    <p>
+      With greedy players, both drafts take the same eight spots in the same order.
+      The draft only decides who gets each one. Snake hands the weaker second-round
+      picks back to the seats that picked first.
+    </p>
+    <div class="token-strip-wrap panel wide">
+      <table class="token-strip">
+        <caption class="byline">Average value of each pick, 100,000 games per draft on separated boards.
+          Value = sum of the dice weights around the spot.</caption>
+        <tbody>
+          <tr>
+            <th scope="row">Turn</th>
+            <td class="token-strip__turn">1</td><td class="token-strip__turn">2</td>
+            <td class="token-strip__turn">3</td><td class="token-strip__turn">4</td>
+            <td class="token-strip__turn">5</td><td class="token-strip__turn">6</td>
+            <td class="token-strip__turn">7</td><td class="token-strip__turn">8</td>
+          </tr>
+          <tr>
+            <th scope="row">Pick value</th>
+            <td><span class="token">12.5</span></td>
+            <td><span class="token">11.8</span></td>
+            <td><span class="token">11.1</span></td>
+            <td><span class="token">10.6</span></td>
+            <td><span class="token token--late">10.0</span></td>
+            <td><span class="token token--late">9.4</span></td>
+            <td><span class="token token--late">8.8</span></td>
+            <td><span class="token token--late">8.2</span></td>
+          </tr>
+          <tr class="token-strip__divider">
+            <th scope="row">Snake</th>
+            <td class="token-strip__owner token-strip__owner--snake">A</td>
+            <td class="token-strip__owner token-strip__owner--snake">B</td>
+            <td class="token-strip__owner token-strip__owner--snake">C</td>
+            <td class="token-strip__owner token-strip__owner--snake">D</td>
+            <td class="token-strip__owner token-strip__owner--snake">D</td>
+            <td class="token-strip__owner token-strip__owner--snake">C</td>
+            <td class="token-strip__owner token-strip__owner--snake">B</td>
+            <td class="token-strip__owner token-strip__owner--snake">A</td>
+          </tr>
+          <tr>
+            <th scope="row">Standard</th>
+            <td class="token-strip__owner token-strip__owner--standard">A</td>
+            <td class="token-strip__owner token-strip__owner--standard">B</td>
+            <td class="token-strip__owner token-strip__owner--standard">C</td>
+            <td class="token-strip__owner token-strip__owner--standard">D</td>
+            <td class="token-strip__owner token-strip__owner--standard">A</td>
+            <td class="token-strip__owner token-strip__owner--standard">B</td>
+            <td class="token-strip__owner token-strip__owner--standard">C</td>
+            <td class="token-strip__owner token-strip__owner--standard">D</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Headline numbers: 4 stat tiles from results/summary.md. -->
+    <h2>Results at a glance</h2>
+    <ul class="stats">
+      <li class="stat">
+        <span class="stat__value stat__value--snake">0.19</span>
+        <span class="stat__label">points between the best and worst seat on average, snake draft</span>
+      </li>
+      <li class="stat">
+        <span class="stat__value stat__value--standard">3.64</span>
+        <span class="stat__label">points between the best and worst seat, standard draft</span>
+      </li>
+      <li class="stat">
+        <span class="stat__value stat__value--standard">90%</span>
+        <span class="stat__label">of standard-draft games won by seat A (ties split)</span>
+      </li>
+      <li class="stat">
+        <span class="stat__value">4&times;</span>
+        <span class="stat__label">smaller snake gap when 6s and 8s are kept apart (0.88 to 0.19)</span>
+      </li>
+    </ul>
+
+    <!-- Cards linking to every page. -->
+    <h2>Explore</h2>
+    <ul class="card-grid">
+      <li class="card">
+        <a class="card__title" href="results.html">Results</a>
+        <span class="card__desc">Charts and tables from 400,000 simulated games, including a heatmap of where players settle.</span>
+      </li>
+      <li class="card">
+        <a class="card__title" href="index.html">Introduction</a>
+        <span class="card__desc">Background, what the model does and doesn't include, how spots are scored, and how the experiments are set up.</span>
+      </li>
+      <li class="card">
+        <a class="card__title" href="watch.html">Watch a game</a>
+        <span class="card__desc">Step through a computer game move by move, snake and standard side by side on the same board.</span>
+      </li>
+      <li class="card">
+        <a class="card__title" href="play.html">Play</a>
+        <span class="card__desc">Draft two settlement spots against three computer players, right in the browser.</span>
+      </li>
+    </ul>
+  </main>
+
+  <!-- Footer: team + course, source code, where the numbers come from. Same on every page. -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>Quentin Drucker and Emmett Manning, COM313 Algorithmic Game Theory, Prof. Christine Chung</p>
+      <p><a href="https://github.com/quentin-drucker/catan-settlement-strategy">Source code on GitHub</a></p>
+      <p>Rebuild every number with <code>python main.py experiments --games 100000</code></p>
+    </div>
+  </footer>
+</body>
+</html>

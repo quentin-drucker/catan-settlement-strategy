@@ -84,14 +84,14 @@ and the commands to test it yourself.
 Final presentation = one website with a main dashboard; each card opens a page.
 
 Pages:
-- **Dashboard** (`index.html`): one-line summary, headline numbers, cards linking to the pages below.
+- **Dashboard** (`dashboard.html`): one-line summary, headline numbers, cards linking to the pages below.
 - **Play**: click spots on a drawn board against 3 greedy CPUs. Legal / blocked / taken
   spots shown; hover = spot value; options for seed, draft, board mode, which seat to play.
 - **Watch**: CPU game step by step (Next / Autoplay). Snake and standard side by side on the
   same board -> shows "same spots, different owners".
 - **Results**: the 100,000-game findings: headline table, the 5 charts, short explanations
   (content from `docs/experiments.md` and `results/summary.md`).
-- **About**: background on the topic (course needs >= 1 page), rules, scoring, method, limits.
+- **Introduction** (`index.html`, home page; was "About"): background on the topic (course needs >= 1 page), rules, scoring, method, limits.
 - **Strategies** (only if Issue #6 is done): blocking CPU vs greedy. No card until it exists.
 
 How the game runs in the browser:
