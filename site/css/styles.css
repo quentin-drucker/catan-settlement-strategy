@@ -929,6 +929,9 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
 /* Dashboard: the question headline gets a touch more room below. */
 .page--dashboard h1 { margin-bottom: var(--space-4); }
 
+/* About: centred page title. */
+.page--about h1 { text-align: center; }
+
 /* Phones: smaller page title and tokens so the strip fits without scrolling. */
 @media (max-width: 34rem) {
   :root {
