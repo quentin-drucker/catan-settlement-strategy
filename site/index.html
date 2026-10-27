@@ -5,7 +5,7 @@
   - the research question + one-paragraph answer
   - the token strip: the 8 greedy picks and who gets each under snake vs standard
   - headline numbers (stat row)
-  - links to the other pages (Results, About; Watch and Play are still planned)
+  - buttons to the main pages + cards linking to every page (Watch and Play are still planned)
   All numbers come from results/summary.md (100,000 games per setup).
   All styling lives in css/styles.css.
 -->
@@ -33,7 +33,7 @@
         <a href="index.html" aria-current="page">Dashboard</a>
         <a href="results.html">Results</a>
         <a href="about.html">About</a>
-        <a href="https://github.com/quentin-drucker/catan-settlement-strategy">Code</a>
+        <a href="https://github.com/quentin-drucker/catan-settlement-strategy">Source code</a>
       </nav>
     </div>
   </header>
@@ -47,6 +47,12 @@
       Over 100,000 games, the snake order (A B C D D C B A) shrinks the gap between the
       best and worst seat from 3.64 points under the standard order to 0.19.
     </p>
+    <!-- Main actions: the two pages that exist so far. -->
+    <div class="button-row">
+      <a class="button button--primary" href="results.html">See the results</a>
+      <a class="button button--secondary" href="about.html">How it works</a>
+    </div>
+    <div class="ornament" aria-hidden="true"><span class="ornament__hex"></span></div>
 
     <!-- Token strip: average value of each pick in turn order (separated boards),
          from the "1st/2nd pick value" columns in results/summary.md. -->
@@ -56,7 +62,7 @@
       The draft only decides who gets each one. Snake hands the weaker second-round
       picks back to the seats that picked first.
     </p>
-    <div class="token-strip-wrap wide">
+    <div class="token-strip-wrap panel wide">
       <table class="token-strip">
         <caption class="byline">Average value of each pick, 100,000 games per draft on separated boards.
           Value = sum of the dice weights around the spot.</caption>
@@ -126,24 +132,24 @@
       </li>
     </ul>
 
-    <!-- Links to the other pages. Planned pages have no link until they exist. -->
+    <!-- Cards linking to every page. Planned pages have no link until they exist. -->
     <h2>Explore</h2>
-    <ul class="page-list">
-      <li class="page-list__item">
-        <a class="page-list__link" href="results.html">Results</a>
-        <span class="page-list__desc">Charts and tables from 400,000 simulated games, including a heatmap of where players settle.</span>
+    <ul class="card-grid">
+      <li class="card">
+        <a class="card__title" href="results.html">Results</a>
+        <span class="card__desc">Charts and tables from 400,000 simulated games, including a heatmap of where players settle.</span>
       </li>
-      <li class="page-list__item">
-        <a class="page-list__link" href="about.html">About</a>
-        <span class="page-list__desc">Background, the rules of the model, how spots are scored, and how the experiments work.</span>
+      <li class="card">
+        <a class="card__title" href="about.html">About</a>
+        <span class="card__desc">Background, the rules of the model, how spots are scored, and how the experiments work.</span>
       </li>
-      <li class="page-list__item page-list__item--planned">
-        <span class="page-list__link">Watch a game</span>
-        <span class="page-list__desc">Step through a computer game, snake and standard side by side. In progress.</span>
+      <li class="card card--planned">
+        <span class="card__title">Watch a game <span class="badge">In progress</span></span>
+        <span class="card__desc">Step through a computer game, snake and standard side by side.</span>
       </li>
-      <li class="page-list__item page-list__item--planned">
-        <span class="page-list__link">Play</span>
-        <span class="page-list__desc">Draft against three computer players in the browser. In progress.</span>
+      <li class="card card--planned">
+        <span class="card__title">Play <span class="badge">In progress</span></span>
+        <span class="card__desc">Draft against three computer players in the browser.</span>
       </li>
     </ul>
   </main>

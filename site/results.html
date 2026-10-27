@@ -31,7 +31,7 @@
         <a href="index.html">Dashboard</a>
         <a href="results.html" aria-current="page">Results</a>
         <a href="about.html">About</a>
-        <a href="https://github.com/quentin-drucker/catan-settlement-strategy">Code</a>
+        <a href="https://github.com/quentin-drucker/catan-settlement-strategy">Source code</a>
       </nav>
     </div>
   </header>
@@ -51,10 +51,11 @@
       production, not actual resources. Snake and standard play the same boards (same seeds),
       so the draft order is the only difference between them.
     </p>
+    <div class="ornament" aria-hidden="true"><span class="ornament__hex"></span></div>
 
     <!-- Overview: one row per setup. Key row = the project default (snake, separated). -->
     <h2>Overview</h2>
-    <div class="table-wrap wide">
+    <div class="table-wrap panel wide">
       <table class="data-table">
         <caption>Mean payoff per seat, fairness gap and within-game spread (points)</caption>
         <thead>
@@ -99,7 +100,7 @@
 
     <!-- Experiment 1: draft position under snake, explained by pick values. -->
     <h2>1. Why snake nearly evens things out</h2>
-    <figure class="figure wide">
+    <figure class="figure panel wide">
       <img class="figure__img" src="results/pick_values.png" width="1500" height="720"
            alt="Stacked bars per seat showing first-pick and second-pick value. Snake: first picks fall from 12.5 (A) to 10.6 (D) while second picks rise from 8.2 (A) to 10.0 (D), totals 20.5 to 20.7. Standard: both picks fall from A to D, totals 22.4 to 18.8.">
       <figcaption class="figure__caption">
@@ -116,7 +117,7 @@
 
     <!-- Experiment 2: snake vs standard on identical boards. -->
     <h2>2. Snake vs standard on the same boards</h2>
-    <figure class="figure wide">
+    <figure class="figure panel wide">
       <img class="figure__img" src="results/seat_payoffs.png" width="1200" height="720"
            alt="Grouped bars of mean payoff by seat. Snake: A 20.71, B 20.55, C 20.53, D 20.52. Standard: A 22.44, B 21.14, C 19.94, D 18.80.">
       <figcaption class="figure__caption">
@@ -135,7 +136,7 @@
         who gets each one, which is why the second-pick values in the two drafts are the same four
         numbers handed to opposite seats.</li>
     </ul>
-    <figure class="figure wide">
+    <figure class="figure panel wide">
       <img class="figure__img" src="results/win_share.png" width="1200" height="720"
            alt="Share of games won by seat. Snake: A 34%, B 20%, C 20%, D 26%. Standard: A 90%, B 9%, C 1%, D 0%. A line marks the even split of 25%.">
       <figcaption class="figure__caption">
@@ -146,7 +147,7 @@
 
     <!-- Experiment 3: separated vs random boards. -->
     <h2>3. Separated vs random boards</h2>
-    <figure class="figure wide">
+    <figure class="figure panel wide">
       <img class="figure__img" src="results/fairness.png" width="1500" height="720"
            alt="Two bar charts. Fairness gap: snake 0.19 (separated) and 0.88 (random); standard 3.64 and 4.46. Average within-game spread: snake 1.48 and 1.89; standard 3.64 and 4.46.">
       <figcaption class="figure__caption">
@@ -164,7 +165,7 @@
 
     <!-- Heatmap: which board positions get taken. -->
     <h2>Where players settle</h2>
-    <figure class="figure wide">
+    <figure class="figure panel wide">
       <img class="figure__img" src="results/heatmap.png" width="1650" height="840"
            alt="Two hex-board heatmaps. Coast corners are rarely taken. The most-taken spots, about 37% of games each, form a ring around the centre hex. First picks follow the same ring at about 5% each.">
       <figcaption class="figure__caption">
@@ -182,7 +183,7 @@
     <!-- Full tables: every seat statistic per setup (from results/summary.md). -->
     <h2>Seat details</h2>
     <p>Mean payoff (&plusmn; 95% CI), first and second pick value, and win share, per setup.</p>
-    <div class="table-wrap wide">
+    <div class="table-wrap panel wide">
       <table class="data-table data-table--compact">
         <caption>Snake draft, separated boards</caption>
         <thead><tr><th scope="col">Seat</th><th scope="col" class="num">Mean payoff</th><th scope="col" class="num">1st pick</th><th scope="col" class="num">2nd pick</th><th scope="col" class="num">Win share</th></tr></thead>
@@ -194,7 +195,7 @@
         </tbody>
       </table>
     </div>
-    <div class="table-wrap wide">
+    <div class="table-wrap panel wide">
       <table class="data-table data-table--compact">
         <caption>Standard draft, separated boards</caption>
         <thead><tr><th scope="col">Seat</th><th scope="col" class="num">Mean payoff</th><th scope="col" class="num">1st pick</th><th scope="col" class="num">2nd pick</th><th scope="col" class="num">Win share</th></tr></thead>
@@ -206,7 +207,7 @@
         </tbody>
       </table>
     </div>
-    <div class="table-wrap wide">
+    <div class="table-wrap panel wide">
       <table class="data-table data-table--compact">
         <caption>Snake draft, random boards</caption>
         <thead><tr><th scope="col">Seat</th><th scope="col" class="num">Mean payoff</th><th scope="col" class="num">1st pick</th><th scope="col" class="num">2nd pick</th><th scope="col" class="num">Win share</th></tr></thead>
@@ -218,7 +219,7 @@
         </tbody>
       </table>
     </div>
-    <div class="table-wrap wide">
+    <div class="table-wrap panel wide">
       <table class="data-table data-table--compact">
         <caption>Standard draft, random boards</caption>
         <thead><tr><th scope="col">Seat</th><th scope="col" class="num">Mean payoff</th><th scope="col" class="num">1st pick</th><th scope="col" class="num">2nd pick</th><th scope="col" class="num">Win share</th></tr></thead>

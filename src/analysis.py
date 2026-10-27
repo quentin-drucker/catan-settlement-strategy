@@ -41,10 +41,10 @@ SETUPS = [("snake", "separated"), ("standard", "separated"), ("snake", "random")
 
 # Chart colours = the website's colours (site/css/styles.css), so charts and pages match.
 # Data colours come from the validated reference palette: blue = snake, orange = standard.
-SURFACE = "#F1F0EC"  # page "paper" (warm grey card stock)
+SURFACE = "#FBF7EC"  # card-stock panel the charts sit in on the website
 TEXT = "#2B2622"  # warm dark ink
-TEXT_SECONDARY = "#625A52"  # muted ink
-GRID = "#D9D5CC"  # hairline rules
+TEXT_SECONDARY = "#5C5249"  # muted ink
+GRID = "#DCCFB2"  # hairline rules
 TILE, TILE_EDGE = "#E7E2D4", "#C4BCA8"  # hex tiles in the board heatmap
 DRAFT_COLORS = {"snake": "#2a78d6", "standard": "#eb6834"}
 PICK_COLORS = ("#1baf7a", "#eda100")  # 1st pick aqua, 2nd pick yellow (not blue/orange: those mean snake/standard)

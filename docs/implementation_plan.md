@@ -118,6 +118,9 @@ Build order (each step leaves a working site):
    - `site/build_site.py` assembles `_site/` (pages + charts) for the workflow and local preview.
    - Board drawing component (`.board`) already in styles.css for steps 2-3.
    - The other 3 style options stay only in the local, git-ignored `theme-previews/` folder.
+   - Polish pass: parchment page texture (CSS-drawn, no image files), centred folder-tab
+     navigation, buttons, framed card-stock panels for charts/tables, stat tiles, clickable
+     Explore cards, one hex ornament per page. Charts sit on the same card colour.
 2. Watch page (Pyodide + SVG board).
 3. Play page (same board drawing + clicks).
 4. Strategies page if Issue #6 happens.

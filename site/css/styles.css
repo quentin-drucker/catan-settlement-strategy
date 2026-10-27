@@ -9,8 +9,9 @@
    2. Base               page defaults, font files, headings, paragraphs, links, focus.
    3. Layout             page width, header + nav, main column, footer.
    4. Components         reusable pieces, one class each (+ "--modifier" variations):
-                         .skip-link, .lede, .stats/.stat, .token-strip, .token,
-                         .figure, .data-table, .page-list, .note, .command, .board
+                         .skip-link, .lede, .byline, .ornament, .button, .panel,
+                         .stats/.stat, .token-strip, .token, .figure, .data-table,
+                         .card-grid/.card, .badge, .note, .command, .board
    5. Page tweaks        small page-specific adjustments (kept short).
 
    Rule of thumb: need a new look? Add a component in section 4 that uses the
@@ -22,26 +23,31 @@
    1. DESIGN VALUES
    ============================================================================= */
 
-/* Theme: "Board-game box". Warm grey card stock, warm dark ink, wheat-gold
-   tokens, slab-serif headings like the lettering on a board-game box.
-   Blue/orange are only for data (snake/standard), gold only for tokens. */
+/* Theme: "Board-game box". Warm parchment page, light card-stock panels with a
+   thin gold inner frame, warm dark ink, wheat-gold tokens, slab-serif headings
+   like the lettering on a board-game box.
+   Blue/orange are only for data (snake/standard), gold for tokens and trim. */
 :root {
   /* Page colours */
-  --color-paper: #F1F0EC;        /* page background: warm grey card stock */
-  --color-paper-alt: #E7E5DE;    /* subtle fill: table headers, note boxes */
-  --color-ink: #2B2622;          /* body text + headings (~13:1 on paper) */
-  --color-ink-muted: #625A52;    /* captions, secondary text (~5.9:1 on paper) */
-  --color-rule: #D9D5CC;         /* hairlines, table borders */
-  --color-focus: #8F6A10;        /* keyboard focus ring (>= 3:1 on paper) */
+  --color-paper: #F2EBD8;        /* page background: warm parchment */
+  --color-paper-alt: #E9E0C9;    /* subtle fill: table headers, inactive tabs */
+  --color-card: #FBF7EC;         /* panels and cards: lighter card stock */
+  --color-card-edge: #D8C9A8;    /* panel/card border */
+  --color-ink: #2B2622;          /* body text + headings (~12.6:1 on paper) */
+  --color-ink-soft: #423A33;     /* primary button hover */
+  --color-ink-muted: #5C5249;    /* captions, secondary text (~6.4:1 on paper) */
+  --color-rule: #DCCFB2;         /* hairlines, table borders */
+  --color-focus: #86630E;        /* keyboard focus ring (>= 3:1 on paper) */
+  --color-gilt: rgba(178, 140, 52, 0.55);  /* thin gold inner frame (decoration only) */
 
   /* Data colours (same as the charts; validated colour-blind safe) */
   --color-snake: #2a78d6;
   --color-standard: #eb6834;
   --color-snake-text: #1f62b3;   /* darker steps for text, so labels pass 4.5:1 */
-  --color-standard-text: #a83f17;
+  --color-standard-text: #a33c15;
 
   /* Catan number tokens */
-  --color-token: #8F6A10;        /* wheat gold: token ring, pips, 6/8 numerals */
+  --color-token: #86630E;        /* wheat gold: token ring, pips, 6/8 numerals, trim */
   --color-token-face: #FBFAF6;   /* token disc */
 
   /* Game board (used by .board; ready for the Watch/Play pages) */
@@ -49,7 +55,7 @@
   --board-tile: #E7E2D4;         /* land hexes (no resources in this model) */
   --board-tile-edge: #C4BCA8;
   --board-spot: #FFFFFF;         /* empty settlement spot */
-  --board-spot-edge: #625A52;
+  --board-spot-edge: #5C5249;
   --board-blocked: #C4BCA8;      /* spot next to a settlement */
   --board-token-face: var(--color-token-face);
   --board-token-ink: var(--color-ink);
@@ -92,7 +98,22 @@
   --width-page: 68rem;   /* header/footer */
   --gutter: 1rem;        /* side padding at phone width */
   --radius-sm: 3px;
+  --radius-card: 6px;    /* panels, cards, buttons, tabs */
   --token-size: 3.1rem;
+
+  /* Depth: soft warm shadows + the gold inner frame used by panels and cards.
+     box-shadow = a blurred copy of the box drawn underneath it. */
+  --shadow-card: 0 1px 1px rgba(60, 42, 14, 0.06), 0 8px 18px -12px rgba(60, 42, 14, 0.35);
+  --shadow-card-hover: 0 2px 2px rgba(60, 42, 14, 0.08), 0 16px 26px -14px rgba(60, 42, 14, 0.45);
+  --frame-inset: inset 0 0 0 5px var(--color-card), inset 0 0 0 6px var(--color-gilt);
+
+  /* Parchment texture, drawn by the browser from two tiny inline SVGs (no image
+     files). feTurbulence = random "noise"; the colour matrix turns it into faint
+     brown specks (grain) and large soft blotches (mottling). Kept very light so
+     text contrast stays >= 4.5:1. */
+  --texture-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.27 0 0 0 0 0.12 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --texture-mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.40 0 0 0 0 0.16 0 0 0 0.16 -0.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  --vignette: radial-gradient(ellipse at 50% 35%, transparent 60%, rgba(120, 88, 40, 0.09) 100%);
 }
 
 
@@ -139,7 +160,9 @@ html {
 
 body {
   margin: 0;
-  background: var(--color-paper);
+  background-color: var(--color-paper);
+  background-image: var(--vignette), var(--texture-mottle), var(--texture-grain);
+  background-attachment: fixed, scroll, scroll;  /* edges stay shaded while scrolling */
   color: var(--color-ink);
   font-family: var(--font-text);
   font-size: var(--text-md);
@@ -200,56 +223,70 @@ strong { font-weight: 600; }
    3. LAYOUT
    ============================================================================= */
 
-/* Header: brand on the left, page links on the right; wraps on phones. */
+/* Header: a card-stock band with the brand centred on top and the page links
+   as folder tabs along its bottom edge. The current page's tab joins the page. */
 .site-header {
-  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-card);
+  border-bottom: 1px solid var(--color-card-edge);
 }
 .site-header__inner {
   max-width: var(--width-page);
   margin: 0 auto;
-  padding: var(--space-4) var(--gutter);
+  padding: var(--space-5) var(--gutter) 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3) var(--space-5);
+  gap: var(--space-4);
 }
 
-/* Brand = small hex mark + project name, links to the dashboard. */
+/* Brand = hex mark + project name in the heading font, links to the dashboard. */
 .brand {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-family: var(--font-ui);
+  font-family: var(--font-heading);
   font-weight: 600;
-  font-size: var(--text-sm);
+  font-size: var(--text-lg);
   text-decoration: none;
 }
 .brand__mark {
-  width: 1.3rem;
-  height: 1.5rem;
+  width: 1.5rem;
+  height: 1.75rem;
   fill: none;
   stroke: var(--color-token);
   stroke-width: 2.5;
 }
 
-/* Page links. The current page gets aria-current="page" (also read by screen readers). */
+/* Page links as tabs. aria-current="page" marks the page being viewed (also
+   read out by screen readers). margin-bottom: -1px lets tabs sit on the border. */
 .nav {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1) var(--space-5);
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: -1px;
   font-family: var(--font-ui);
   font-size: var(--text-sm);
+  font-weight: 600;
 }
 .nav a {
-  text-decoration: none;
+  padding: var(--space-2) var(--space-5);
   color: var(--color-ink-muted);
-  padding: var(--space-1) 0;
+  text-decoration: none;
+  background: var(--color-paper-alt);
+  border: 1px solid var(--color-card-edge);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
-.nav a:hover { color: var(--color-ink); }
+.nav a:hover {
+  color: var(--color-ink);
+  background: var(--color-paper);
+}
 .nav a[aria-current="page"] {
   color: var(--color-ink);
-  box-shadow: inset 0 -2px 0 var(--color-token);  /* underline that doesn't shift text */
+  background-color: var(--color-paper);
+  background-image: var(--texture-grain);
+  border-bottom-color: var(--color-paper);       /* tab opens into the page */
+  box-shadow: inset 0 3px 0 var(--color-token);  /* gold edge on the active tab */
 }
 
 /* Main column: text stays narrow; children marked as wide may stretch further. */
@@ -266,7 +303,8 @@ strong { font-weight: 600; }
 
 /* Footer: course + repository + how to rebuild. */
 .site-footer {
-  border-top: 1px solid var(--color-rule);
+  background: var(--color-card);
+  border-top: 1px solid var(--color-card-edge);
   font-family: var(--font-ui);
   font-size: var(--text-sm);
   color: var(--color-ink-muted);
@@ -317,22 +355,96 @@ strong { font-weight: 600; }
   margin-top: calc(-1 * var(--space-2));
 }
 
-/* Stats: headline numbers in a 2 x 2 grid, split by thin rules (not boxed cards).
-   Used on the dashboard. .stat__value--snake / --standard tint a number by draft. */
+/* Ornament: a small gold hex between two fading gold rules. One per page, under
+   the intro, as a quiet divider. Decorative only (aria-hidden in the HTML). */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 16rem;
+  margin: var(--space-5) auto var(--space-6);
+}
+.ornament::before,
+.ornament::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-token));
+}
+.ornament::after { background: linear-gradient(to left, transparent, var(--color-token)); }
+.ornament__hex {
+  width: 0.8rem;
+  height: 0.92rem;
+  background: var(--color-token);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+/* Buttons: links styled as buttons, for the main actions on a page.
+   .button--primary = dark with a thin gold inner line (game-box trim);
+   .button--secondary = light card stock. Used on the dashboard. */
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-5) 0 0;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid transparent;
+  border-radius: var(--radius-card);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.button:hover { transform: translateY(-1px); }
+.button--primary {
+  background: var(--color-ink);
+  color: var(--color-card);
+  border-color: var(--color-ink);
+  box-shadow: inset 0 0 0 3px var(--color-ink), inset 0 0 0 4px var(--color-gilt), var(--shadow-card);
+}
+.button--primary:hover { background: var(--color-ink-soft); }
+.button--secondary {
+  background: var(--color-card);
+  color: var(--color-ink);
+  border-color: var(--color-card-edge);
+  box-shadow: var(--shadow-card);
+}
+.button--secondary:hover { box-shadow: var(--shadow-card-hover); }
+
+/* Panel: a framed sheet of card stock (border + thin gold inner frame + soft
+   shadow) that holds a chart, a table or the token strip so it stands off the
+   textured page. Used on every page. */
+.panel {
+  background: var(--color-card);
+  border: 1px solid var(--color-card-edge);
+  border-radius: var(--radius-card);
+  box-shadow: var(--frame-inset), var(--shadow-card);
+  padding: var(--space-5);
+}
+
+/* Stats: headline numbers as small tiles in a 2 x 2 grid, each with a gold top
+   edge. Used on the dashboard. .stat__value--snake / --standard tint a number by draft. */
 .stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-6) 0;
-  margin: var(--space-6) 0;
+  gap: var(--space-4);
+  margin: var(--space-5) 0 var(--space-6);
   padding: 0;
   list-style: none;
 }
 .stat {
   margin: 0;
-  padding: 0 var(--space-5);
-  border-left: 1px solid var(--color-rule);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-card);
+  border: 1px solid var(--color-card-edge);
+  border-radius: var(--radius-card);
+  box-shadow: inset 0 3px 0 var(--color-token), var(--shadow-card);
 }
-.stat:nth-child(odd) { border-left: 0; padding-left: 0; }   /* left column: no rule */
 .stat__value {
   display: block;
   font-family: var(--font-ui);
@@ -357,7 +469,7 @@ strong { font-weight: 600; }
    read it as rows and columns. Used on the dashboard. */
 .token-strip-wrap {
   overflow-x: auto;              /* only scrolls on very narrow screens */
-  margin: var(--space-6) 0 var(--space-2);
+  margin: var(--space-5) 0 var(--space-6);
 }
 .token-strip {
   border-collapse: collapse;
@@ -438,11 +550,10 @@ strong { font-weight: 600; }
 }
 .figure__img {
   width: 100%;
-  border: 1px solid var(--color-rule);
   border-radius: var(--radius-sm);
 }
 .figure__caption {
-  margin-top: var(--space-2);
+  margin-top: var(--space-3);
   font-family: var(--font-ui);
   font-size: var(--text-sm);
   line-height: 1.5;
@@ -451,12 +562,13 @@ strong { font-weight: 600; }
 }
 
 /* Data table: numbers right-aligned in equal-width digits so columns line up.
-   Used on Results (seat tables) and About (rules). Wrap in .table-wrap so wide
-   tables scroll sideways on phones instead of breaking the page. */
+   Used on Results (seat tables) and About (rules). Wrap in .table-wrap (+ .panel)
+   so wide tables scroll sideways on phones instead of breaking the page. */
 .table-wrap {
   overflow-x: auto;
   margin: var(--space-5) 0;
 }
+.table-wrap.panel { padding: var(--space-4); }
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -489,51 +601,105 @@ strong { font-weight: 600; }
 .data-table__row--key td,
 .data-table__row--key th { font-weight: 600; }
 
-/* Page list: the dashboard's links to the other pages, each with a small hex
-   marker and one line on what's there. A plain list, not a card grid. */
-.page-list {
-  list-style: none;
-  padding: 0;
+/* Card grid: the dashboard's links to the other pages. Each card is one page,
+   with a gold hex marker, a title and one line on what's there. The whole card
+   is clickable: the title link's ::after stretches over the card.
+   .card--planned = page not built yet (no link, dashed outline, muted). */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
   margin: var(--space-4) 0;
-  border-top: 1px solid var(--color-rule);
+  padding: 0;
+  list-style: none;
 }
-.page-list__item {
-  margin: 0;
-  padding: var(--space-4) 0 var(--space-4) var(--space-6);
-  border-bottom: 1px solid var(--color-rule);
+.card {
   position: relative;
+  margin: 0;
+  padding: var(--space-5) var(--space-5) var(--space-5) calc(var(--space-5) + 1.4rem);
+  background: var(--color-card);
+  border: 1px solid var(--color-card-edge);
+  border-radius: var(--radius-card);
+  box-shadow: var(--frame-inset), var(--shadow-card);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.page-list__item::before {        /* the hex marker (CSS-only shape) */
+.card::before {                  /* the hex marker (CSS-only shape) */
   content: "";
   position: absolute;
-  left: 0.2rem;
-  top: calc(var(--space-4) + 0.35rem);
+  left: var(--space-5);
+  top: calc(var(--space-5) + 0.3rem);
   width: 0.85rem;
   height: 0.98rem;
   background: var(--color-token);
   clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
 }
-.page-list__link {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: var(--text-md);
+.card:hover,
+.card:focus-within {
+  transform: translateY(-2px);
+  box-shadow: var(--frame-inset), var(--shadow-card-hover);
 }
-.page-list__desc {
+.card__title {
   display: block;
-  color: var(--color-ink-muted);
-  font-size: var(--text-md);
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
 }
-/* A page that doesn't exist yet: no link, muted marker. */
-.page-list__item--planned { color: var(--color-ink-muted); }
-.page-list__item--planned::before { background: var(--color-rule); }
+.card__title::after {            /* makes the whole card the click target */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
+}
+.card__title:focus-visible { outline: none; }
+.card:focus-within { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+.card__desc {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--color-ink-muted);
+}
+.card--planned {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+  color: var(--color-ink-muted);
+}
+.card--planned::before { background: var(--color-card-edge); }
+.card--planned:hover { transform: none; box-shadow: none; }
+
+/* Badge: a small rounded label, e.g. "In progress" on a planned card.
+   Inside a card title it drops to its own line so every card lines up. */
+.badge {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-card-edge);
+  border-radius: 999px;
+  background: var(--color-paper-alt);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.6;
+  vertical-align: middle;
+  color: var(--color-ink-muted);
+}
+.card__title .badge {
+  display: table;                /* own line, but only as wide as its text */
+  margin: var(--space-1) 0 0;
+}
 
 /* Note: a short aside (caveats, limits). Left rule instead of a full box.
    Used on Results and About. */
 .note {
   margin: var(--space-5) 0;
   padding: var(--space-3) var(--space-4);
-  background: var(--color-paper-alt);
+  background: var(--color-card);
+  border: 1px solid var(--color-card-edge);
   border-left: 3px solid var(--color-token);
+  border-radius: var(--radius-sm);
   font-size: var(--text-md);
 }
 .note p:last-child { margin-bottom: 0; }
@@ -542,7 +708,8 @@ strong { font-weight: 600; }
 .command {
   margin: var(--space-3) 0 var(--space-5);
   padding: var(--space-3) var(--space-4);
-  background: var(--color-paper-alt);
+  background: var(--color-card);
+  border: 1px solid var(--color-card-edge);
   border-radius: var(--radius-sm);
   overflow-x: auto;
   font-size: var(--text-sm);
@@ -624,11 +791,18 @@ strong { font-weight: 600; }
     padding-right: var(--space-1);
     font-size: var(--text-xs);
   }
-  .stats { grid-template-columns: 1fr; gap: var(--space-5); }
-  .stat,
-  .stat:nth-child(odd) {
-    border-left: 0;
-    padding: 0;
-  }
+  .stats,
+  .card-grid { grid-template-columns: 1fr; }
   .token { font-size: var(--text-xs); }
+  .panel { padding: var(--space-3); }
+  .nav a { padding: var(--space-2) var(--space-3); }
+}
+
+/* People who ask their system for less motion: no lifting on hover. */
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .card { transition: none; }
+  .button:hover,
+  .card:hover,
+  .card:focus-within { transform: none; }
 }
