@@ -181,5 +181,5 @@ removing the turn check -> 2 tests fail.
 ## Not included
 
 - Running thousands of games, CSV export, fairness statistics and charts: Issue #4.
-- The Pygame window: Issue #5.
+- The interactive website (play + watch in the browser): Issue #5.
 - The blocking-aware CPU: Issue #6. The `Strategy` interface is ready for it.

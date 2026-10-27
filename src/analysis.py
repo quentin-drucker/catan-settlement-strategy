@@ -28,6 +28,7 @@ import matplotlib
 
 matplotlib.use("Agg")  # draw straight to image files; no window needed
 import matplotlib.pyplot as plt  # noqa: E402  (must come after choosing the backend)
+from matplotlib import font_manager  # noqa: E402
 from matplotlib.colors import LinearSegmentedColormap  # noqa: E402
 from matplotlib.patches import Polygon  # noqa: E402
 
@@ -38,15 +39,27 @@ from src.simulation import simulate  # noqa: E402
 # The four setups compared: (draft, board mode).
 SETUPS = [("snake", "separated"), ("standard", "separated"), ("snake", "random"), ("standard", "random")]
 
-# Chart colours (validated reference palette): blue = snake, orange = standard.
-SURFACE = "#fcfcfb"
-TEXT = "#0b0b0b"
-TEXT_SECONDARY = "#52514e"
-GRID = "#e4e3df"
+# Chart colours = the website's colours (site/css/styles.css), so charts and pages match.
+# Data colours come from the validated reference palette: blue = snake, orange = standard.
+SURFACE = "#F1F0EC"  # page "paper" (warm grey card stock)
+TEXT = "#2B2622"  # warm dark ink
+TEXT_SECONDARY = "#625A52"  # muted ink
+GRID = "#D9D5CC"  # hairline rules
+TILE, TILE_EDGE = "#E7E2D4", "#C4BCA8"  # hex tiles in the board heatmap
 DRAFT_COLORS = {"snake": "#2a78d6", "standard": "#eb6834"}
 PICK_COLORS = ("#1baf7a", "#eda100")  # 1st pick aqua, 2nd pick yellow (not blue/orange: those mean snake/standard)
 # One-hue blue ramp (light -> dark) for the heatmap.
 HEAT_RAMP = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
+
+# Same font as the website's labels: Archivo Regular + SemiBold, stored in site/fonts/.
+# Fixed-weight files (not the variable font) so matplotlib can find both weights.
+# Falls back to matplotlib's default font if the files are missing.
+FONT_DIR = Path(__file__).resolve().parent.parent / "site" / "fonts"
+FONT_FILES = [FONT_DIR / "Archivo-Regular.ttf", FONT_DIR / "Archivo-SemiBold.ttf"]
+if all(f.exists() for f in FONT_FILES):
+    for f in FONT_FILES:
+        font_manager.fontManager.addfont(str(f))
+    plt.rcParams["font.family"] = "Archivo"
 
 
 # --- Statistics ------------------------------------------------------------------
@@ -193,7 +206,7 @@ def _figure(ncols: int = 1, width: float = 8.0, height: float = 4.8):
 
 
 def _save(fig, path: Path, title: str, subtitle: str) -> Path:
-    fig.suptitle(title, color=TEXT, fontsize=13, fontweight="bold", x=0.02, ha="left")
+    fig.suptitle(title, color=TEXT, fontsize=13, fontweight="semibold", x=0.02, ha="left")
     fig.text(0.02, 0.905, subtitle, color=TEXT_SECONDARY, fontsize=9, ha="left")
     fig.tight_layout(rect=(0, 0, 1, 0.9))
     fig.savefig(path, dpi=150, facecolor=SURFACE)
@@ -311,8 +324,8 @@ def plot_heatmap(s: dict, path: Path) -> Path:
     for ax, (counts, title) in zip(axes, panels):
         shares = [100 * counts[v] / s["games"] for v in range(len(board.vertices))]
         for h in board.hexes:
-            ax.add_patch(Polygon([pos[c] for c in h.corners], closed=True, facecolor="#f0efec",
-                                 edgecolor="#c9c8c2", linewidth=1))
+            ax.add_patch(Polygon([pos[c] for c in h.corners], closed=True, facecolor=TILE,
+                                 edgecolor=TILE_EDGE, linewidth=1))
         dots = ax.scatter([pos[v][0] for v in pos], [pos[v][1] for v in pos], c=shares, cmap=cmap,
                           vmin=0, vmax=max(shares), s=170, edgecolors=SURFACE, linewidths=1.5, zorder=3)
         for v, share in enumerate(shares):  # label only the 5 most-taken spots (selective labels)

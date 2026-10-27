@@ -1,0 +1,634 @@
+/* =============================================================================
+   styles.css: the one stylesheet for the whole website.
+   Every page links this file; no page has its own <style> block or style="" attributes.
+
+   How to use this file
+   --------------------
+   1. Design values      CSS variables (= a named value defined once, reused everywhere):
+                         colours, fonts, font sizes, spacing, widths, radius.
+   2. Base               page defaults, font files, headings, paragraphs, links, focus.
+   3. Layout             page width, header + nav, main column, footer.
+   4. Components         reusable pieces, one class each (+ "--modifier" variations):
+                         .skip-link, .lede, .stats/.stat, .token-strip, .token,
+                         .figure, .data-table, .page-list, .note, .command, .board
+   5. Page tweaks        small page-specific adjustments (kept short).
+
+   Rule of thumb: need a new look? Add a component in section 4 that uses the
+   variables from section 1. Don't hard-code colours or sizes anywhere else.
+   ============================================================================= */
+
+
+/* =============================================================================
+   1. DESIGN VALUES
+   ============================================================================= */
+
+/* Theme: "Board-game box". Warm grey card stock, warm dark ink, wheat-gold
+   tokens, slab-serif headings like the lettering on a board-game box.
+   Blue/orange are only for data (snake/standard), gold only for tokens. */
+:root {
+  /* Page colours */
+  --color-paper: #F1F0EC;        /* page background: warm grey card stock */
+  --color-paper-alt: #E7E5DE;    /* subtle fill: table headers, note boxes */
+  --color-ink: #2B2622;          /* body text + headings (~13:1 on paper) */
+  --color-ink-muted: #625A52;    /* captions, secondary text (~5.9:1 on paper) */
+  --color-rule: #D9D5CC;         /* hairlines, table borders */
+  --color-focus: #8F6A10;        /* keyboard focus ring (>= 3:1 on paper) */
+
+  /* Data colours (same as the charts; validated colour-blind safe) */
+  --color-snake: #2a78d6;
+  --color-standard: #eb6834;
+  --color-snake-text: #1f62b3;   /* darker steps for text, so labels pass 4.5:1 */
+  --color-standard-text: #a83f17;
+
+  /* Catan number tokens */
+  --color-token: #8F6A10;        /* wheat gold: token ring, pips, 6/8 numerals */
+  --color-token-face: #FBFAF6;   /* token disc */
+
+  /* Game board (used by .board; ready for the Watch/Play pages) */
+  --board-sea: #D3E0E6;          /* water around the island */
+  --board-tile: #E7E2D4;         /* land hexes (no resources in this model) */
+  --board-tile-edge: #C4BCA8;
+  --board-spot: #FFFFFF;         /* empty settlement spot */
+  --board-spot-edge: #625A52;
+  --board-blocked: #C4BCA8;      /* spot next to a settlement */
+  --board-token-face: var(--color-token-face);
+  --board-token-ink: var(--color-ink);
+  --board-token-high: var(--color-token);
+  --board-piece-label: #FFFFFF;  /* white letter on every player colour (>= 4.5:1) */
+  --player-a: #c2410c;           /* player colours: validated all-pairs on the tiles; */
+  --player-b: #1d4ed8;           /* each piece also shows its letter (second cue) */
+  --player-c: #15803d;
+  --player-d: #a21caf;
+
+  /* Fonts */
+  --font-heading: "Zilla Slab", Georgia, serif;          /* page and section titles */
+  --font-text: "Archivo", "Segoe UI", Arial, sans-serif; /* body text */
+  --font-ui: "Archivo", "Segoe UI", Arial, sans-serif;   /* nav, numbers, tables, labels */
+
+  /* Type scale: 1.25 ratio on an 18px base (rem = root font size = 18px) */
+  --text-xs: 0.722rem;   /* 13px */
+  --text-sm: 0.833rem;   /* 15px */
+  --text-md: 1rem;       /* 18px body */
+  --text-lg: 1.222rem;   /* 22px */
+  --text-xl: 1.556rem;   /* 28px */
+  --text-2xl: 1.944rem;  /* 35px */
+  --text-3xl: 2.444rem;  /* 44px, page title */
+  --leading-text: 1.55;
+  --leading-tight: 1.18;
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+
+  /* Widths + shape */
+  --width-text: 38rem;   /* reading column, ~68 characters per line */
+  --width-wide: 56rem;   /* figures and tables may run wider than the text */
+  --width-page: 68rem;   /* header/footer */
+  --gutter: 1rem;        /* side padding at phone width */
+  --radius-sm: 3px;
+  --token-size: 3.1rem;
+}
+
+
+/* =============================================================================
+   2. BASE
+   ============================================================================= */
+
+/* Font files (stored in site/fonts/, open licence: OFL). One file per weight. */
+@font-face {
+  font-family: "Archivo";
+  src: url("../fonts/Archivo-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;            /* show fallback text while the font loads */
+}
+@font-face {
+  font-family: "Archivo";
+  src: url("../fonts/Archivo-SemiBold.ttf") format("truetype");
+  font-weight: 600;              /* same two files the charts use (src/analysis.py) */
+  font-display: swap;
+}
+@font-face {
+  font-family: "Zilla Slab";
+  src: url("../fonts/ZillaSlab-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Zilla Slab";
+  src: url("../fonts/ZillaSlab-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-display: swap;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;        /* width includes padding: simpler maths */
+}
+
+html {
+  font-size: 112.5%;             /* 18px when the browser default is 16px */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-text);
+  font-size: var(--text-md);
+  line-height: var(--leading-text);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  line-height: var(--leading-tight);
+  font-weight: 600;
+  margin: var(--space-7) 0 var(--space-3);
+}
+h1 {
+  font-size: var(--text-3xl);
+  margin-top: var(--space-7);
+  letter-spacing: -0.01em;
+}
+h2 { font-size: var(--text-2xl); }
+h3 { font-size: var(--text-lg); margin-top: var(--space-6); }
+
+p,
+ul,
+ol {
+  margin: 0 0 var(--space-4);
+}
+li + li { margin-top: var(--space-1); }
+
+/* Links: ink-coloured with an underline (blue is reserved for data). */
+a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: var(--color-ink-muted);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+a:hover { text-decoration-thickness: 2px; }
+
+/* Visible keyboard focus on every interactive element. */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+code {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.88em;
+}
+
+strong { font-weight: 600; }
+
+
+/* =============================================================================
+   3. LAYOUT
+   ============================================================================= */
+
+/* Header: brand on the left, page links on the right; wraps on phones. */
+.site-header {
+  border-bottom: 1px solid var(--color-rule);
+}
+.site-header__inner {
+  max-width: var(--width-page);
+  margin: 0 auto;
+  padding: var(--space-4) var(--gutter);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+}
+
+/* Brand = small hex mark + project name, links to the dashboard. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+.brand__mark {
+  width: 1.3rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: var(--color-token);
+  stroke-width: 2.5;
+}
+
+/* Page links. The current page gets aria-current="page" (also read by screen readers). */
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-5);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+.nav a {
+  text-decoration: none;
+  color: var(--color-ink-muted);
+  padding: var(--space-1) 0;
+}
+.nav a:hover { color: var(--color-ink); }
+.nav a[aria-current="page"] {
+  color: var(--color-ink);
+  box-shadow: inset 0 -2px 0 var(--color-token);  /* underline that doesn't shift text */
+}
+
+/* Main column: text stays narrow; children marked as wide may stretch further. */
+.page {
+  max-width: var(--width-text);
+  margin: 0 auto;
+  padding: 0 var(--gutter) var(--space-8);
+}
+.page > .wide {
+  width: min(var(--width-wide), calc(100vw - 2 * var(--gutter)));
+  margin-left: 50%;
+  transform: translateX(-50%);  /* centre a block that's wider than its column */
+}
+
+/* Footer: course + repository + how to rebuild. */
+.site-footer {
+  border-top: 1px solid var(--color-rule);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+.site-footer__inner {
+  max-width: var(--width-page);
+  margin: 0 auto;
+  padding: var(--space-5) var(--gutter) var(--space-6);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+}
+.site-footer p { margin: 0; }
+
+
+/* =============================================================================
+   4. COMPONENTS
+   ============================================================================= */
+
+/* Skip link: first thing a keyboard user reaches; jumps past the header.
+   Hidden until focused. Used on every page. */
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: -3rem;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  z-index: 10;
+}
+.skip-link:focus { top: var(--space-2); }
+
+/* Lede: the opening paragraph under a page title, a size up from body text.
+   Used at the top of every page. */
+.lede {
+  font-size: var(--text-lg);
+  line-height: 1.5;
+  color: var(--color-ink);
+}
+
+/* Small "where this comes from" line under a title or figure. */
+.byline {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+  margin-top: calc(-1 * var(--space-2));
+}
+
+/* Stats: headline numbers in a 2 x 2 grid, split by thin rules (not boxed cards).
+   Used on the dashboard. .stat__value--snake / --standard tint a number by draft. */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-6) 0;
+  margin: var(--space-6) 0;
+  padding: 0;
+  list-style: none;
+}
+.stat {
+  margin: 0;
+  padding: 0 var(--space-5);
+  border-left: 1px solid var(--color-rule);
+}
+.stat:nth-child(odd) { border-left: 0; padding-left: 0; }   /* left column: no rule */
+.stat__value {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: lining-nums;
+}
+.stat__value--snake { color: var(--color-snake-text); }
+.stat__value--standard { color: var(--color-standard-text); }
+.stat__label {
+  display: block;
+  margin-top: var(--space-2);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--color-ink-muted);
+}
+
+/* Token strip: the 8 greedy picks in turn order as Catan-style tokens, with who
+   gets each pick under snake and standard. A real <table>, so screen readers
+   read it as rows and columns. Used on the dashboard. */
+.token-strip-wrap {
+  overflow-x: auto;              /* only scrolls on very narrow screens */
+  margin: var(--space-6) 0 var(--space-2);
+}
+.token-strip {
+  border-collapse: collapse;
+  margin: 0 auto;
+  font-family: var(--font-ui);
+}
+.token-strip caption {
+  caption-side: bottom;          /* caption reads as a source line under the strip */
+  padding-top: var(--space-3);
+  margin-top: 0;
+}
+.token-strip th,
+.token-strip td {
+  padding: var(--space-1) var(--space-1);
+  text-align: center;
+  font-weight: 400;
+}
+.token-strip th[scope="row"] {
+  text-align: right;
+  padding-right: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+}
+.token-strip__turn {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+.token-strip__owner {
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+.token-strip__owner--snake { color: var(--color-snake-text); }
+.token-strip__owner--standard { color: var(--color-standard-text); }
+.token-strip__divider th,
+.token-strip__divider td {
+  border-top: 1px solid var(--color-rule);
+}
+
+/* Token: one round Catan number token (disc + number, optional pips).
+   Used in the token strip and the dice-weight table (About).
+   .token--late = picks 5-8, drawn lighter: the leftovers after round one.
+   .token--high = a 6 or 8 (the most likely numbers), numeral in ochre. */
+.token {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--token-size);
+  height: var(--token-size);
+  border-radius: 50%;
+  background: var(--color-token-face);
+  border: 2px solid var(--color-token);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  line-height: 1;
+  color: var(--color-ink);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.token--late {
+  border-style: dashed;
+  font-weight: 400;
+}
+.token--high { color: var(--color-token); }
+/* Pips = the dots under a token's number; count = ways to roll it out of 36. */
+.token__pips {
+  margin-top: 0.2em;
+  font-size: 0.55em;
+  letter-spacing: 0.08em;
+  color: var(--color-token);
+}
+
+/* Figure: a chart image with a caption under it. Add .wide to let it run past
+   the text column. Used on the Results page. */
+.figure {
+  margin: var(--space-6) 0;
+}
+.figure__img {
+  width: 100%;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-sm);
+}
+.figure__caption {
+  margin-top: var(--space-2);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-ink-muted);
+  max-width: var(--width-text);
+}
+
+/* Data table: numbers right-aligned in equal-width digits so columns line up.
+   Used on Results (seat tables) and About (rules). Wrap in .table-wrap so wide
+   tables scroll sideways on phones instead of breaking the page. */
+.table-wrap {
+  overflow-x: auto;
+  margin: var(--space-5) 0;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+.data-table caption {
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-ink);
+  padding-bottom: var(--space-2);
+}
+.data-table th,
+.data-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-rule);
+  text-align: left;
+  vertical-align: top;
+}
+.data-table thead th {
+  background: var(--color-paper-alt);
+  font-weight: 600;
+  border-bottom-color: var(--color-ink-muted);
+}
+.data-table .num { text-align: right; white-space: nowrap; }
+.data-table--compact th,
+.data-table--compact td { padding: var(--space-1) var(--space-2); }
+/* Row that is the main point of the table (e.g. snake on separated boards). */
+.data-table__row--key td,
+.data-table__row--key th { font-weight: 600; }
+
+/* Page list: the dashboard's links to the other pages, each with a small hex
+   marker and one line on what's there. A plain list, not a card grid. */
+.page-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-4) 0;
+  border-top: 1px solid var(--color-rule);
+}
+.page-list__item {
+  margin: 0;
+  padding: var(--space-4) 0 var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-rule);
+  position: relative;
+}
+.page-list__item::before {        /* the hex marker (CSS-only shape) */
+  content: "";
+  position: absolute;
+  left: 0.2rem;
+  top: calc(var(--space-4) + 0.35rem);
+  width: 0.85rem;
+  height: 0.98rem;
+  background: var(--color-token);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+.page-list__link {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: var(--text-md);
+}
+.page-list__desc {
+  display: block;
+  color: var(--color-ink-muted);
+  font-size: var(--text-md);
+}
+/* A page that doesn't exist yet: no link, muted marker. */
+.page-list__item--planned { color: var(--color-ink-muted); }
+.page-list__item--planned::before { background: var(--color-rule); }
+
+/* Note: a short aside (caveats, limits). Left rule instead of a full box.
+   Used on Results and About. */
+.note {
+  margin: var(--space-5) 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-paper-alt);
+  border-left: 3px solid var(--color-token);
+  font-size: var(--text-md);
+}
+.note p:last-child { margin-bottom: 0; }
+
+/* Command: a terminal command to copy (reproduce the results). */
+.command {
+  margin: var(--space-3) 0 var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-paper-alt);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+/* Board: SVG drawing of the 19-hex board (sea, tiles, tokens, settlement spots,
+   pieces). Styled here so every theme recolours it. Ready for the Watch/Play
+   pages; also used by the style preview. Spot states:
+   --legal (open), --blocked (next to a settlement); pieces use --a..--d. */
+.board {
+  display: block;
+  width: 100%;
+  max-width: 34rem;
+  height: auto;
+  margin: 0 auto;
+}
+.board__sea { fill: var(--board-sea); }
+.board__tile {
+  fill: var(--board-tile);
+  stroke: var(--board-tile-edge);
+  stroke-width: 1.5;
+}
+.board__token {
+  fill: var(--board-token-face);
+  stroke: var(--board-token-high);
+  stroke-width: 1.5;
+}
+.board__token-number {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 15px;
+  fill: var(--board-token-ink);
+  text-anchor: middle;
+}
+.board__token-number--high { fill: var(--board-token-high); }
+.board__pip { fill: var(--board-token-high); }
+.board__spot {
+  fill: var(--board-spot);
+  stroke: var(--board-spot-edge);
+  stroke-width: 1.2;
+}
+.board__spot--blocked {
+  fill: var(--board-blocked);
+  stroke: none;
+}
+.board__piece { stroke: var(--board-spot); stroke-width: 2; }
+.board__piece--a { fill: var(--player-a); }
+.board__piece--b { fill: var(--player-b); }
+.board__piece--c { fill: var(--player-c); }
+.board__piece--d { fill: var(--player-d); }
+.board__piece-label {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 11px;
+  fill: var(--board-piece-label);
+  text-anchor: middle;
+}
+
+
+/* =============================================================================
+   5. PAGE TWEAKS
+   ============================================================================= */
+
+/* Dashboard: the question headline gets a touch more room below. */
+.page--dashboard h1 { margin-bottom: var(--space-4); }
+
+/* Phones: smaller page title and tokens so the strip fits without scrolling. */
+@media (max-width: 34rem) {
+  :root {
+    --text-3xl: 2rem;
+    --text-2xl: 1.6rem;
+    --token-size: 1.85rem;
+  }
+  /* Tighter strip so all 8 turns fit a ~360px screen without scrolling. */
+  .token-strip th,
+  .token-strip td { padding: 2px 1px; }
+  .token-strip th[scope="row"] {
+    padding-right: var(--space-1);
+    font-size: var(--text-xs);
+  }
+  .stats { grid-template-columns: 1fr; gap: var(--space-5); }
+  .stat,
+  .stat:nth-child(odd) {
+    border-left: 0;
+    padding: 0;
+  }
+  .token { font-size: var(--text-xs); }
+}
