@@ -112,11 +112,12 @@ Hosting:
 Build order (each step leaves a working site):
 1. Dashboard + Results + About (static) + deploy workflow -> site live with the findings. **Done.**
    - `site/css/styles.css` = all styling; design values as CSS variables at the top.
-   - Fonts in `site/fonts/` (Newsreader, Archivo; open licence). Charts use the same Archivo files.
+   - Style: **"Board-game box"** (chosen from 4 options): warm grey card stock, warm dark ink,
+     wheat-gold tokens, Zilla Slab headings + Archivo text. Charts use the same colours and font.
+   - Fonts in `site/fonts/` (Zilla Slab, Archivo; open licence).
    - `site/build_site.py` assembles `_site/` (pages + charts) for the workflow and local preview.
    - Board drawing component (`.board`) already in styles.css for steps 2-3.
-   - Style options: 3 alternative themes live in styles.css section 1b until one is picked;
-     the unused ones (and their fonts) then get deleted.
+   - The other 3 style options stay only in the local, git-ignored `theme-previews/` folder.
 2. Watch page (Pyodide + SVG board).
 3. Play page (same board drawing + clicks).
 4. Strategies page if Issue #6 happens.

@@ -6,7 +6,6 @@
    --------------------
    1. Design values      CSS variables (= a named value defined once, reused everywhere):
                          colours, fonts, font sizes, spacing, widths, radius.
-                         Also the preview themes (alternative value sets, see 1b).
    2. Base               page defaults, font files, headings, paragraphs, links, focus.
    3. Layout             page width, header + nav, main column, footer.
    4. Components         reusable pieces, one class each (+ "--modifier" variations):
@@ -23,38 +22,38 @@
    1. DESIGN VALUES
    ============================================================================= */
 
-/* 1a. Default theme: "Sea frame" (approved direction).
-   Cool sea-tinted paper + slate ink, like the blue frame around a Catan board.
-   Blue/orange are only for data (snake/standard), ochre only for tokens. */
+/* Theme: "Board-game box". Warm grey card stock, warm dark ink, wheat-gold
+   tokens, slab-serif headings like the lettering on a board-game box.
+   Blue/orange are only for data (snake/standard), gold only for tokens. */
 :root {
   /* Page colours */
-  --color-paper: #F6F8F9;        /* page background */
-  --color-paper-alt: #ECF1F3;    /* subtle fill: table headers, note boxes */
-  --color-ink: #1E2B33;          /* body text + headings (~13:1 on paper) */
-  --color-ink-muted: #56636B;    /* captions, secondary text (~5.8:1 on paper) */
-  --color-rule: #D8DFE3;         /* hairlines, table borders */
-  --color-focus: #9A6B12;        /* keyboard focus ring (>= 3:1 on paper) */
+  --color-paper: #F1F0EC;        /* page background: warm grey card stock */
+  --color-paper-alt: #E7E5DE;    /* subtle fill: table headers, note boxes */
+  --color-ink: #2B2622;          /* body text + headings (~13:1 on paper) */
+  --color-ink-muted: #625A52;    /* captions, secondary text (~5.9:1 on paper) */
+  --color-rule: #D9D5CC;         /* hairlines, table borders */
+  --color-focus: #8F6A10;        /* keyboard focus ring (>= 3:1 on paper) */
 
   /* Data colours (same as the charts; validated colour-blind safe) */
   --color-snake: #2a78d6;
   --color-standard: #eb6834;
   --color-snake-text: #1f62b3;   /* darker steps for text, so labels pass 4.5:1 */
-  --color-standard-text: #b9461a;
+  --color-standard-text: #a83f17;
 
   /* Catan number tokens */
-  --color-token: #9A6B12;        /* ochre: token ring, pips, 6/8 numerals */
-  --color-token-face: #FFFFFF;   /* token disc */
+  --color-token: #8F6A10;        /* wheat gold: token ring, pips, 6/8 numerals */
+  --color-token-face: #FBFAF6;   /* token disc */
 
   /* Game board (used by .board; ready for the Watch/Play pages) */
-  --board-sea: #DCE8EE;          /* water around the island */
-  --board-tile: #ECEFE9;         /* land hexes (no resources in this model) */
-  --board-tile-edge: #C9D2D7;
+  --board-sea: #D3E0E6;          /* water around the island */
+  --board-tile: #E7E2D4;         /* land hexes (no resources in this model) */
+  --board-tile-edge: #C4BCA8;
   --board-spot: #FFFFFF;         /* empty settlement spot */
-  --board-spot-edge: #56636B;
-  --board-blocked: #C9D2D7;      /* spot next to a settlement */
-  --board-token-face: var(--color-token-face);  /* tokens on the board; a theme can */
-  --board-token-ink: var(--color-ink);          /* set these apart from the page's */
-  --board-token-high: var(--color-token);       /* tokens (e.g. a lit board on a dark page) */
+  --board-spot-edge: #625A52;
+  --board-blocked: #C4BCA8;      /* spot next to a settlement */
+  --board-token-face: var(--color-token-face);
+  --board-token-ink: var(--color-ink);
+  --board-token-high: var(--color-token);
   --board-piece-label: #FFFFFF;  /* white letter on every player colour (>= 4.5:1) */
   --player-a: #c2410c;           /* player colours: validated all-pairs on the tiles; */
   --player-b: #1d4ed8;           /* each piece also shows its letter (second cue) */
@@ -62,9 +61,9 @@
   --player-d: #a21caf;
 
   /* Fonts */
-  --font-heading: "Newsreader", Georgia, serif;
-  --font-text: "Newsreader", Georgia, serif;
-  --font-ui: "Archivo", "Segoe UI", Arial, sans-serif;  /* nav, numbers, tables, labels */
+  --font-heading: "Zilla Slab", Georgia, serif;          /* page and section titles */
+  --font-text: "Archivo", "Segoe UI", Arial, sans-serif; /* body text */
+  --font-ui: "Archivo", "Segoe UI", Arial, sans-serif;   /* nav, numbers, tables, labels */
 
   /* Type scale: 1.25 ratio on an 18px base (rem = root font size = 18px) */
   --text-xs: 0.722rem;   /* 13px */
@@ -74,7 +73,7 @@
   --text-xl: 1.556rem;   /* 28px */
   --text-2xl: 1.944rem;  /* 35px */
   --text-3xl: 2.444rem;  /* 44px, page title */
-  --leading-text: 1.62;  /* serif body likes a little extra line height */
+  --leading-text: 1.55;
   --leading-tight: 1.18;
 
   /* Spacing scale */
@@ -96,102 +95,22 @@
   --token-size: 3.1rem;
 }
 
-/* 1b. Preview themes. Same variable names, different values. Switched on with
-   <html data-theme="...">. Only for picking a style; the unused ones get deleted. */
-
-/* "Field notebook": white page, graphite ink, forest-green tokens, one sans family. */
-:root[data-theme="notebook"] {
-  --color-paper: #FFFFFF;
-  --color-paper-alt: #F2F4F2;
-  --color-ink: #26292B;
-  --color-ink-muted: #5E6366;
-  --color-rule: #E1E4E2;
-  --color-focus: #2F6B4F;
-  --color-token: #2F6B4F;
-  --color-token-face: #FFFFFF;
-  --board-sea: #FFFFFF;
-  --board-tile: #EEF2EC;
-  --board-tile-edge: #C6D0C7;
-  --board-blocked: #C6D0C7;
-  --font-heading: "Atkinson Hyperlegible Next", "Segoe UI", Arial, sans-serif;
-  --font-text: "Atkinson Hyperlegible Next", "Segoe UI", Arial, sans-serif;
-  --font-ui: "Atkinson Hyperlegible Next", "Segoe UI", Arial, sans-serif;
-  --leading-text: 1.55;
-}
-
-/* "Night harbor": dark sea page; the board is drawn as a lit object on top. */
-:root[data-theme="harbor"] {
-  --color-paper: #0F1D26;
-  --color-paper-alt: #16263A;
-  --color-ink: #E4ECF0;
-  --color-ink-muted: #A3B3BD;
-  --color-rule: #2A3D49;
-  --color-focus: #E0BC6B;
-  --color-snake: #3987e5;        /* dark-mode steps of the same data colours */
-  --color-standard: #d95926;
-  --color-snake-text: #7fb0ef;
-  --color-standard-text: #f08a5f;
-  --color-token: #E0BC6B;
-  --color-token-face: #16263A;
-  --board-sea: #0B1720;
-  --board-tile: #DCD6C6;         /* light tiles -> player colours stay validated */
-  --board-tile-edge: #B9B19C;
-  --board-spot: #F4F0E6;
-  --board-spot-edge: #4A4334;
-  --board-blocked: #9C9480;
-  --board-token-face: #F4F0E6;
-  --board-token-ink: #2B2622;
-  --board-token-high: #8F6A10;
-}
-
-/* "Board-game box": warm grey card stock, slab-serif headings, wheat-gold tokens. */
-:root[data-theme="boardgame"] {
-  --color-paper: #F1F0EC;
-  --color-paper-alt: #E7E5DE;
-  --color-ink: #2B2622;
-  --color-ink-muted: #625A52;
-  --color-rule: #D9D5CC;
-  --color-focus: #8F6A10;
-  --color-token: #8F6A10;
-  --color-token-face: #FBFAF6;
-  --board-sea: #D3E0E6;
-  --board-tile: #E7E2D4;
-  --board-tile-edge: #C4BCA8;
-  --board-blocked: #C4BCA8;
-  --font-heading: "Zilla Slab", Georgia, serif;
-  --font-text: "Archivo", "Segoe UI", Arial, sans-serif;
-  --leading-text: 1.55;
-}
-
 
 /* =============================================================================
    2. BASE
    ============================================================================= */
 
-/* Font files (stored in site/fonts/, open licence: OFL). "Variable" fonts = one
-   file holding every weight, so 400 and 600 both come from the same file. */
-@font-face {
-  font-family: "Newsreader";
-  src: url("../fonts/Newsreader.ttf") format("truetype");
-  font-weight: 200 800;
-  font-display: swap;            /* show fallback text while the font loads */
-}
+/* Font files (stored in site/fonts/, open licence: OFL). One file per weight. */
 @font-face {
   font-family: "Archivo";
   src: url("../fonts/Archivo-Regular.ttf") format("truetype");
   font-weight: 400;
-  font-display: swap;
+  font-display: swap;            /* show fallback text while the font loads */
 }
 @font-face {
   font-family: "Archivo";
   src: url("../fonts/Archivo-SemiBold.ttf") format("truetype");
   font-weight: 600;              /* same two files the charts use (src/analysis.py) */
-  font-display: swap;
-}
-@font-face {
-  font-family: "Atkinson Hyperlegible Next";
-  src: url("../fonts/AtkinsonHyperlegibleNext.ttf") format("truetype");
-  font-weight: 200 800;
   font-display: swap;
 }
 @font-face {
