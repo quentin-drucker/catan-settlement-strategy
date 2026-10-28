@@ -11,13 +11,15 @@ of picking first, compared with the **standard** order (A B C D A B C D), and wh
 
 ## The model in brief
 
-- Board = 19 hex tiles with Catan's number tokens; settlements go on the 54 corners.
-- Spot value = sum of the dice weights of its tiles (ways out of 36 to roll the number).
-  - 6 / 8 -> 5, 5 / 9 -> 4, 4 / 10 -> 3, 3 / 11 -> 2, 2 / 12 -> 1, desert -> 0
-  - e.g. tiles 8, 5, 9 -> 5 + 4 + 4 = 13
-- A settlement blocks its own corner and every neighbouring corner.
-- Payoff = value of a player's two spots. CPU players are greedy: best open spot right now.
-- Not modelled: roads, resources, trading, robber, development cards.
+- The board has 19 hex tiles with Catan's number tokens. Settlements go on the 54 corners.
+- A spot is worth the dice weights of its tiles added up. A number's dice weight is how many of
+  the 36 two-dice rolls give that number:
+  - 6 or 8 = 5, 5 or 9 = 4, 4 or 10 = 3, 3 or 11 = 2, 2 or 12 = 1, desert = 0
+  - e.g. a spot touching an 8, a 5 and a 9 is worth 5 + 4 + 4 = 13
+- A settlement blocks its own corner and every corner next to it.
+- A player's payoff is the value of their two spots. The computer players are greedy: they always
+  take the best open spot.
+- Left out on purpose: roads, resource types, trading, the robber and development cards.
 
 ## Setup
 
@@ -38,16 +40,17 @@ python -m pip install -r requirements.txt
 
 | Command | Result |
 |---|---|
-| `python main.py play --seed 42` | 4 CPUs play one game -> final board, turn log, payoffs |
+| `python main.py play --seed 42` | Four computer players play one game; shows the board, the moves and the scores |
 | `python main.py play --seed 42 --draft standard` | Same board, standard order |
-| `python main.py play --seed 42 --step` | Board after every move; Enter = next move |
-| `python main.py play --seed 42 --human A` | Play seat A against 3 CPUs |
-| `python main.py explore --seed 42` | Place all 8 settlements by hand |
-| `python main.py experiments --games 10000 --out check` | Quick re-run of all experiments (~30 s) |
-| `python -m pytest` | Test suite -> `139 passed` |
+| `python main.py play --seed 42 --step` | Shows the board after every move; press Enter for the next one |
+| `python main.py play --seed 42 --human A` | Play seat A against three computer players |
+| `python main.py explore --seed 42` | Place all 8 settlements yourself |
+| `python main.py experiments --games 10000 --out check` | Quick re-run of all the experiments (~30 s) |
+| `python -m pytest` | Runs the tests; should end with `139 passed` |
 
 Options for `play` / `explore`:
-- `--seed N`: same seed -> same board and same game. Left out -> random seed, printed at the top.
+- `--seed N`: the same seed always gives the same board and the same game. Leave it out for a
+  random seed (printed at the top so the game can be replayed).
 - `--board separated|random`: `separated` (default) = no 6 or 8 next to another 6 or 8.
 - `--draft snake|standard`: `snake` is the default.
 - `python main.py --help` and `python main.py play --help` list everything.
@@ -81,7 +84,7 @@ Tie for first: players A, B, C
 | Type | Effect |
 |---|---|
 | `22` | Place on vertex 22 (on a human's turn) |
-| Enter | Let the current CPU move |
+| Enter | Let the current computer player move |
 | `i 22` | Inspect vertex 22: tiles, value, neighbours, legal or not |
 | `v` | Switch board labels between vertex IDs and vertex values |
 | `r` / `q` | Restart the same game / quit |
@@ -100,7 +103,7 @@ python main.py experiments --games 100000 --seed 0
   per player per game).
 - Note: this overwrites the committed `results/`. Add `--out <folder>` to write elsewhere
   and compare.
-- Same seeds -> identical numbers. Expected fairness gap (highest - lowest seat average):
+- The same seeds give identical numbers. Expected fairness gap (best seat's average minus worst):
   snake 0.19 vs standard 3.64 on separated boards; 0.88 vs 4.46 on random boards.
 - Any single game can be replayed: game `i` uses seed `i`, e.g.
   `python main.py play --seed 123 --board random --draft standard`.
