@@ -4,6 +4,7 @@ The pages live in site/, but the charts live in results/ (where the analysis
 writes them). GitHub Pages serves one folder, so this copies both together:
 - site/*                          -> _site/
 - results/*.png + summary.md      -> _site/results/   (raw CSVs are left out: ~90 MB)
+- docs/architecture.png           -> _site/docs/      (Figure 1 on the Introduction page)
 - the game engine's Python files  -> _site/src/       (the Watch/Play pages run them
                                                        in the browser with Pyodide)
 
@@ -29,6 +30,8 @@ def build() -> Path:
     (OUT / "results").mkdir()
     for f in [*sorted((ROOT / "results").glob("*.png")), ROOT / "results" / "summary.md"]:
         shutil.copy2(f, OUT / "results" / f.name)
+    (OUT / "docs").mkdir()
+    shutil.copy2(ROOT / "docs" / "architecture.png", OUT / "docs" / "architecture.png")
     (OUT / "src").mkdir()
     for name in ENGINE_FILES:
         shutil.copy2(ROOT / "src" / name, OUT / "src" / name)

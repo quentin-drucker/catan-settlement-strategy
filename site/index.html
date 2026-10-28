@@ -6,6 +6,7 @@
   - in summary: what the model does and doesn't include, side by side
   - scoring: dice-weight table drawn as Catan number tokens with pips
   - additional information: setups, seeds, tie-breaks, limits
+  - project structure: Figure 1 (docs/architecture.png) + how the parts connect
   Sources: proposal, docs/experiments.md, src/board.py (dice weights).
 -->
 <html lang="en">
@@ -137,6 +138,29 @@
       <li>Greedy players will break ties between same-value spots at random, but that random number is calculated from the seed so this is repeatable as well.</li>
       <li>Strategy is limited by the greedy nature of CPU players, they will not strategically block other players as an actual Catan player might.</li>
     </ul>
+
+    <!-- Project structure: how the code fits together (diagram = docs/architecture.png, copied by build_site.py). -->
+    <h2>Project Structure</h2>
+    <p>
+      Everything runs on one small Python game engine (bottom row of Figure 1). It holds all of the
+      rules: the board and which spots are next to each other, the placement rule, the two draft orders
+      and the greedy player. Every move, whether from a computer player or from you on the Play page,
+      goes through the same rule check, so nothing illegal can slip through.
+    </p>
+    <figure class="figure panel wide">
+      <img class="figure__img" src="docs/architecture.png" width="1483" height="1002"
+           alt="Diagram in three rows. Top: main.py, the terminal program, and the website. Middle: text_view.py for the terminal board, simulation.py plus analysis.py for the experiments and charts, and web.py, the bridge for the website. Bottom: game.py, which uses strategies.py, player.py and board.py. Every part in the top and middle rows goes through game.py.">
+      <figcaption class="figure__caption">
+        Figure 1. Program structure: what a person runs (top), views and analysis (middle), and the game engine (bottom).
+      </figcaption>
+    </figure>
+    <p>
+      Three parts are built on top of the engine (middle row): the terminal view, the simulations that
+      played the 400,000 games behind the Results page, and a small bridge for this website. The Watch
+      and Play pages run the real Python engine right in your browser using Pyodide, so they follow
+      exactly the same rules as the simulations. 139 automated tests check that it all works, and the
+      README on GitHub explains what every file does and how to run it yourself.
+    </p>
   </main>
 
   <!-- Footer (same on every page). -->
