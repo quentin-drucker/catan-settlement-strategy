@@ -85,7 +85,7 @@ Tie for first: players A, B, C
 |---|---|
 | `22` | Place on vertex 22 (on a human's turn) |
 | Enter | Let the current computer player move |
-| `i 22` | Inspect vertex 22: tiles, value, neighbours, legal or not |
+| `i 22` | Inspect vertex 22: tiles, value, neighbors, legal or not |
 | `v` | Switch board labels between vertex IDs and vertex values |
 | `r` / `q` | Restart the same game / quit |
 

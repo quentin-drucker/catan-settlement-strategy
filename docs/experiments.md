@@ -109,8 +109,8 @@ Full tables: [results/summary.md](../results/summary.md). Every confidence inter
 ![Board heatmap](../results/heatmap.png)
 
 - Corners on the coast (touching 1 or 2 tiles) are almost never taken; inland corners (3 tiles) are.
-- The most popular spots form a ring around the centre hex (taken in about 37% of games each), rather
-  than the centre hex's own corners. One possible reason: the centre corners sit close together, so a
+- The most popular spots form a ring around the center hex (taken in about 37% of games each), rather
+  than the center hex's own corners. One possible reason: the center corners sit close together, so a
   settlement there blocks several others.
 
 ## Takeaways
