@@ -1,6 +1,6 @@
 """Terminal (text) view of the board + the interactive play loop.
 
-- Backup / learning view. The main visual is the planned project website (Issue #5).
+- Backup / learning view. The main visual is the project website (Issue #5).
 - ``render``, ``status``, ``describe_*``, ``game_log``, ``apply_command`` = pure
   functions (game in, text out) -> easy to test.
 - ``interactive`` = the loop that prints them and reads commands.

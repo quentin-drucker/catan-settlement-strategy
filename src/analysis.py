@@ -131,6 +131,7 @@ def paired_spread_difference(a: dict, b: dict) -> tuple[float, float]:
 
 
 def _label(s: dict) -> str:
+    """Readable setup name for headings, e.g. "snake draft, separated boards"."""
     return f"{s['draft']} draft, {s['board_mode']} boards"
 
 
@@ -201,11 +202,13 @@ def _style(ax, ylabel: str | None = None) -> None:
 
 
 def _figure(ncols: int = 1, width: float = 8.0, height: float = 4.8):
+    """New figure on the card colour with ``ncols`` side-by-side axes -> (fig, list of axes)."""
     fig, axes = plt.subplots(1, ncols, figsize=(width, height), facecolor=SURFACE, squeeze=False)
     return fig, axes[0]
 
 
 def _save(fig, path: Path, title: str, subtitle: str) -> Path:
+    """Add the left-aligned title + subtitle, write the PNG at 150 dpi, close the figure."""
     fig.suptitle(title, color=TEXT, fontsize=13, fontweight="semibold", x=0.02, ha="left")
     fig.text(0.02, 0.905, subtitle, color=TEXT_SECONDARY, fontsize=9, ha="left")
     fig.tight_layout(rect=(0, 0, 1, 0.9))
