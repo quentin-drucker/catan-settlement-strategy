@@ -39,8 +39,8 @@ from src.simulation import simulate  # noqa: E402
 # The four setups compared: (draft, board mode).
 SETUPS = [("snake", "separated"), ("standard", "separated"), ("snake", "random"), ("standard", "random")]
 
-# Chart colours = the website's colours (site/css/styles.css), so charts and pages match.
-# Data colours come from the validated reference palette: blue = snake, orange = standard.
+# Chart colors = the website's colors (site/css/styles.css), so charts and pages match.
+# Data colors come from the validated reference palette: blue = snake, orange = standard.
 SURFACE = "#FBF7EC"  # card-stock panel the charts sit in on the website
 TEXT = "#2B2622"  # warm dark ink
 TEXT_SECONDARY = "#554B42"  # muted ink
@@ -131,6 +131,7 @@ def paired_spread_difference(a: dict, b: dict) -> tuple[float, float]:
 
 
 def _label(s: dict) -> str:
+    """Readable setup name for headings, e.g. "snake draft, separated boards"."""
     return f"{s['draft']} draft, {s['board_mode']} boards"
 
 
@@ -201,11 +202,13 @@ def _style(ax, ylabel: str | None = None) -> None:
 
 
 def _figure(ncols: int = 1, width: float = 8.0, height: float = 4.8):
+    """New figure on the card color with ``ncols`` side-by-side axes -> (fig, list of axes)."""
     fig, axes = plt.subplots(1, ncols, figsize=(width, height), facecolor=SURFACE, squeeze=False)
     return fig, axes[0]
 
 
 def _save(fig, path: Path, title: str, subtitle: str) -> Path:
+    """Add the left-aligned title + subtitle, write the PNG at 150 dpi, close the figure."""
     fig.suptitle(title, color=TEXT, fontsize=13, fontweight="semibold", x=0.02, ha="left")
     fig.text(0.02, 0.905, subtitle, color=TEXT_SECONDARY, fontsize=9, ha="left")
     fig.tight_layout(rect=(0, 0, 1, 0.9))
