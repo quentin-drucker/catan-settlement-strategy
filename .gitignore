@@ -218,9 +218,6 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Raw simulation output (large, reproducible from seeds)
-results/raw/
-
 # Local comment/docs style reference (not shared)
 COMMENT_STYLE.md
 
