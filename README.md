@@ -46,7 +46,7 @@ python -m pip install -r requirements.txt
 | `python main.py play --seed 42 --human A` | Play seat A against three computer players |
 | `python main.py explore --seed 42` | Place all 8 settlements yourself |
 | `python main.py experiments --games 10000 --out check` | Quick re-run of all the experiments (~30 s) |
-| `python -m pytest` | Runs the tests; should end with `139 passed` |
+| `python -m pytest` | Runs the tests; should end with `162 passed` |
 
 Options for `play` / `explore`:
 - `--seed N`: the same seed always gives the same board and the same game. Leave it out for a
@@ -136,8 +136,8 @@ src/simulation.py    batch games -> CSV
 src/analysis.py      statistics, report, charts
 src/text_view.py     terminal board + interactive loop
 src/web.py           JSON bridge between the website and the engine
-tests/               pytest suite (139 tests)
+tests/               pytest suite (162 tests)
 results/             summary.md + charts from the 100,000-game run
 site/                website pages, styles, JavaScript, fonts
-docs/                experiments write-up, implementation plan, per-issue testing guides
+docs/                experiments write-up, program structure diagram
 ```
