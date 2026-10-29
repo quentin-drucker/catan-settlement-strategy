@@ -111,7 +111,7 @@
     </ul>
 
     <!-- Experiment 2: snake vs standard on identical boards. -->
-    <h2>2. Snake vs standard on the same boards</h2>
+    <h2>2. Snake vs Standard on the Same Boards</h2>
     <figure class="figure panel wide">
       <img class="figure__img" src="results/seat_payoffs.png" width="1200" height="720"
            alt="Grouped bars of mean payoff by seat. Snake: A 20.71, B 20.55, C 20.53, D 20.52. Standard: A 22.44, B 21.14, C 19.94, D 18.80.">
@@ -121,15 +121,10 @@
       </figcaption>
     </figure>
     <ul>
-      <li>Standard is a strict ladder: A 22.44 &gt; B 21.14 &gt; C 19.94 &gt; D 18.80.</li>
-      <li>Game by game on the same boards, snake shrinks the best-vs-worst spread by
-        <strong>2.16 &plusmn; 0.007</strong> points (separated boards) and 2.57 &plusmn; 0.008 (random boards).</li>
-      <li>Under standard, seat A can never score below anyone. Greedy pick values never go up
-        (good spots only disappear), so each of A's picks beats B's, B's beat C's, and so on.
-        A finished first, alone or tied, in all 100,000 games.</li>
-      <li>Both drafts take the exact same eight spots in the same order. The draft only decides
-        who gets each one, which is why the second-pick values in the two drafts are the same four
-        numbers handed to opposite seats.</li>
+      <li>Standard draft, from best to worst: A 22.44, B 21.14, C 19.94, D 18.80.</li>
+      <li>A snake draft shrinks the best-to-worst gap inside a game by 2.16 points on separated boards and 2.57 on random boards.</li>
+      <li>In a standard draft, A finished first, alone or tied, in all 100,000 games, because each later pick is worth no more than the one before it.</li>
+      <li>Both drafts take the same eight spots in the same order. Only the player who receives each spot changes.</li>
     </ul>
     <figure class="figure panel wide">
       <img class="figure__img" src="results/win_share.png" width="1200" height="720"
