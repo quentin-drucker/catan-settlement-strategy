@@ -42,15 +42,11 @@
     <!-- Intro: what was run and how precise the numbers are. -->
     <h1>Results</h1>
     <p class="lede">
-      400,000 simulated games: the snake and standard drafts, each played on 100,000
-      separated boards and 100,000 random boards. Every margin below is a 95% confidence
-      interval of &plusmn;0.01 points or less, so the differences are real for these players.
-    </p>
-    <p>
-      All four players are greedy computer players: each turn they take the open spot worth the
-      most right now. Payoff = the dice weights around a player's two settlements, i.e. expected
-      production, not actual resources. Snake and standard play the same boards (same seeds),
-      so the draft order is the only difference between them.
+      These results come from 400,000 simulated games. The snake draft and the standard draft were
+      each played on 100,000 'traditional separated' boards and 100,000 'true random' boards. All four
+      players follow a simple greedy rule, taking the highest-value open spot every turn. A player's
+      payoff is the total dice weight of the tiles around their two settlements. Each game uses the same
+      seed in both drafts, so the boards match and the draft order is the only difference.
     </p>
     <div class="ornament" aria-hidden="true"><span class="ornament__hex"></span></div>
 
