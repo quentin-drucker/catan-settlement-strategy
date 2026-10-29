@@ -63,6 +63,7 @@
   --board-tile-edge: #A9BE97;
   --board-spot: #FFFFFF;         /* empty settlement spot */
   --board-spot-edge: #554B42;
+  --board-spot-open: #3F6B2E;    /* deep green ring on open spots (Play), apart from the gold tokens */
   --board-blocked: #A9BE97;      /* spot next to a settlement (matches the tile edge) */
   --board-token-face: var(--color-token-face);
   --board-token-ink: var(--color-ink);
@@ -710,6 +711,21 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
 /* Scoreboard row of the player whose turn it is: tinted in their color, with a bar. */
 .score-row--current { background: color-mix(in srgb, var(--player) 14%, transparent); }
 .score-row--current th { box-shadow: inset 3px 0 0 var(--player); }
+/* End of game: rows tied for the best payoff (starred) glow in the player's color. */
+.score-row--winner {
+  background: color-mix(in srgb, var(--player) 20%, transparent);
+  animation: winner-glow 1.2s ease-in-out infinite alternate;
+}
+.score-row--winner th { box-shadow: inset 3px 0 0 var(--player); }
+.score-row--winner .num {
+  font-weight: 600;
+  color: var(--color-token);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--color-token) 60%, transparent);
+}
+@keyframes winner-glow {
+  from { background: color-mix(in srgb, var(--player) 8%, transparent); }
+  to   { background: color-mix(in srgb, var(--player) 32%, transparent); }
+}
 .board-panel .table-wrap { margin: var(--space-3) 0; }
 
 /* Move log: numbered list of moves so far, small print. */
@@ -788,20 +804,21 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   fill: var(--board-blocked);
   stroke: none;
 }
-/* Play page: an open spot the human can pick. Grows and turns gold on hover or
-   keyboard focus so it's obvious what can be clicked. */
+/* Play page: an open spot the human can pick. Green ring, so it doesn't read as a
+   token; grows and turns gold on hover or keyboard focus so it's obvious what can be clicked. */
 .board__spot-button { cursor: pointer; }
 .board__hit { fill: transparent; }   /* invisible bigger tap area around an open spot */
 .board__spot-button .board__spot {
-  stroke: var(--color-token);
+  stroke: var(--board-spot-open);
   stroke-width: 2;
   transform-box: fill-box;       /* scale each spot around its own centre */
   transform-origin: center;
-  transition: transform 0.18s ease, stroke-width 0.18s ease, fill 0.18s ease;
+  transition: transform 0.18s ease, stroke-width 0.18s ease, fill 0.18s ease, stroke 0.18s ease;
 }
 .board__spot-button:hover .board__spot,
 .board__spot-button:focus .board__spot {
   fill: var(--color-token-face);
+  stroke: var(--color-token);
   stroke-width: 3.5;
   transform: scale(1.4);
 }
@@ -879,5 +896,5 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   .board__tile, .board__spot-button .board__spot { transition: none; }
   .board__spot-button:hover .board__spot,
   .board__spot-button:focus .board__spot { transform: none; }
-  .board__last, .board__new, .player-chip--active { animation: none; }
+  .board__last, .board__new, .player-chip--active, .score-row--winner { animation: none; }
 }

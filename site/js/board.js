@@ -132,7 +132,8 @@ export const playerChip = (name, active = false) =>
 export const playerColor = (name) => `var(--player-${name.toLowerCase()})`;
 
 // Scoreboard rows: one per player with a coloured chip, settlements and payoff.
-// The row of the player whose turn it is gets tinted in their color.
+// The row of the player whose turn it is gets tinted in their color; at the end,
+// every player tied for the best payoff (the starred rows) glows instead.
 export function renderScores(tbody, state, board) {
   const values = new Map(board.vertices.map((v) => [v.id, v.value]));
   tbody.replaceChildren();
@@ -140,8 +141,8 @@ export function renderScores(tbody, state, board) {
     const row = document.createElement("tr");
     const spots = p.settlements.map((s) => `${s} (${values.get(s)})`).join(" + ") || "none yet";
     const winner = state.winners.includes(p.name);
-    if (p.name === state.current) {                // null once the game is over
-      row.className = "score-row--current";
+    if (p.name === state.current || winner) {      // current is null once the game is over
+      row.className = winner ? "score-row--winner" : "score-row--current";
       row.style.setProperty("--player", playerColor(p.name));
     }
     row.innerHTML = `
