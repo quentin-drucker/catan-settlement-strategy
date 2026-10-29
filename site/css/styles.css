@@ -28,7 +28,9 @@
 /* Theme: "Board-game box". Warm parchment page, light card-stock panels with a
    thin gold inner frame, warm dark ink, wheat-gold tokens, slab-serif headings
    like the lettering on a board-game box.
-   Blue/orange are only for data (snake/standard), gold for tokens and trim. */
+   Blue/orange are only for data (snake/standard), gold for tokens and trim.
+   The Catan box red, title yellow and island green are decoration only:
+   the ribbon under the menu, and the hex beside each section heading. */
 :root {
   /* Page colours */
   --color-paper: #F2EBD8;        /* page background: warm parchment */
@@ -41,6 +43,12 @@
   --color-rule: #DCCFB2;         /* hairlines, table borders */
   --color-focus: #86630E;        /* keyboard focus ring (>= 3:1 on paper) */
   --color-gilt: rgba(178, 140, 52, 0.55);  /* thin gold inner frame (decoration only) */
+
+  /* Catan box accents (decoration only; too bright for text on parchment).
+     Yellow is a step deeper than the printed title (#FFDC54) so it shows here. */
+  --color-box-red: #B4232A;
+  --color-box-yellow: #E6B422;
+  --color-box-green: #3E7A45;
 
   --color-error: #a33c15;        /* rejected move / load failure messages (5.5:1) */
 
@@ -186,6 +194,38 @@ h1 {
   letter-spacing: -0.01em;
 }
 h2 { font-size: var(--text-2xl); }
+
+/* Section mark: a small hex in the left margin, cycling red, yellow, green
+   down the page. Board-panel titles are labels for a game, so they stay plain.
+   The centred Introduction title has no mark (a side hex would shift it). */
+.page:not(.page--intro) > h1,
+.page > h2,
+.card-grid h1,
+.card-grid h2 {
+  position: relative;
+  padding-left: 1.35rem;
+}
+.page:not(.page--intro) > h1::before,
+.page > h2::before,
+.card-grid h1::before,
+.card-grid h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.32em;
+  width: 0.78rem;
+  height: 0.9rem;
+  background: var(--color-box-red);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+.page > h2:nth-of-type(3n+2)::before { background: var(--color-box-yellow); }
+.page > h2:nth-of-type(3n)::before { background: var(--color-box-green); }
+/* Play and Results already spend red on the page title, so their sections start at yellow. */
+.page:not(.page--intro) > h2:nth-of-type(3n+1)::before { background: var(--color-box-yellow); }
+.page:not(.page--intro) > h2:nth-of-type(3n+2)::before { background: var(--color-box-green); }
+.page:not(.page--intro) > h2:nth-of-type(3n)::before { background: var(--color-box-red); }
+/* Watch: the title and "Things to Note" sit side by side, so they take the first two colours. */
+.card-grid h2::before { background: var(--color-box-yellow); }
 h3 { font-size: var(--text-lg); margin-top: var(--space-6); }
 
 p,
@@ -232,6 +272,18 @@ strong { font-weight: 600; }
   background: var(--color-card);
   border-bottom: 1px solid var(--color-card-edge);
 }
+/* Ribbon: three thin stripes in the box colours, under the menu on every page. */
+.site-header::after {
+  content: "";
+  display: block;
+  height: 9px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-box-red) 0 3px,
+    var(--color-box-yellow) 3px 6px,
+    var(--color-box-green) 6px 9px
+  );
+}
 .site-header__inner {
   max-width: var(--width-page);
   margin: 0 auto;
@@ -261,13 +313,13 @@ strong { font-weight: 600; }
 }
 
 /* Page links as tabs. aria-current="page" marks the page being viewed (also
-   read out by screen readers). margin-bottom: -1px lets tabs sit on the border. */
+   read out by screen readers). The box-colour ribbon sits just below them. */
 .nav {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-2);
-  margin-bottom: -1px;
+  margin-bottom: 0;
   font-family: var(--font-ui);
   font-size: var(--text-sm);
   font-weight: 600;
@@ -288,7 +340,7 @@ strong { font-weight: 600; }
   color: var(--color-ink);
   background-color: var(--color-paper);
   background-image: var(--texture-grain);
-  border-bottom-color: var(--color-paper);       /* tab opens into the page */
+  border-bottom-color: var(--color-card-edge);
   box-shadow: inset 0 3px 0 var(--color-token);  /* gold edge on the active tab */
 }
 
