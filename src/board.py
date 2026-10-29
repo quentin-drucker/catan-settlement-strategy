@@ -42,8 +42,16 @@ NUMBER_TOKENS: tuple[int, ...] = (2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10,
 # The two most likely numbers (weight 5 each). "separated" boards keep these apart.
 HIGH_PROBABILITY_NUMBERS = frozenset({6, 8})
 
-# Board-generation modes: "random" = any layout, "separated" = no 6/8 next to another 6/8.
-BOARD_MODES = ("random", "separated")
+# Board-generation modes: "random" = any layout, "separated" = no 6/8 next to another 6/8,
+# "classic" = the rulebook's lettered tokens laid in a spiral (see CLASSIC_* below).
+BOARD_MODES = ("random", "separated", "classic")
+
+# Catan rulebook setup: tokens A-R (letter on the back) go out in alphabetical order,
+# starting at a corner and spiralling counterclockwise towards the centre, skipping the desert.
+CLASSIC_TOKENS: tuple[int, ...] = (5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11)  # A-R
+# Hex IDs in spiral order: outer ring counterclockwise from the top-left hex, then the
+# inner ring the same way, then the centre.
+CLASSIC_SPIRAL: tuple[int, ...] = (0, 3, 7, 12, 16, 17, 18, 15, 11, 6, 2, 1, 4, 8, 13, 14, 10, 5, 9)
 
 # Hexes up to 2 steps from the centre -> the standard 19-hex board.
 BOARD_RADIUS = 2
@@ -200,11 +208,15 @@ def generate_board(seed: int | None = None, mode: str = "separated", max_attempt
     - ``mode="separated"`` (default): reshuffle until no 6/8 touches another 6/8
       (rejection sampling). Raises ``BoardGenerationError`` after ``max_attempts``
       instead of looping forever. ~14% of shuffles pass -> ~7 tries on average.
+    - ``mode="classic"``: the seed only picks the desert tile; the tokens then follow
+      the rulebook spiral (``classic_board``).
     - Same ``seed`` + ``mode`` -> same board every time.
     """
     if mode not in BOARD_MODES:
         raise ValueError(f"unknown board mode {mode!r}; expected one of {BOARD_MODES}")
     rng = random.Random(seed)
+    if mode == "classic":
+        return classic_board(rng.randrange(len(CLASSIC_SPIRAL)))
     tiles: list[int | None] = [*NUMBER_TOKENS, None]
     for _ in range(max_attempts):
         rng.shuffle(tiles)
@@ -214,3 +226,18 @@ def generate_board(seed: int | None = None, mode: str = "separated", max_attempt
     raise BoardGenerationError(
         f"could not generate a {mode!r} board in {max_attempts} attempts (seed={seed})"
     )
+
+
+def classic_board(desert: int = 9) -> Board:
+    """Rulebook layout: tokens A-R along ``CLASSIC_SPIRAL``, skipping the ``desert`` hex.
+
+    Desert in the centre (hex 9, the default) -> the rulebook's starting board.
+    """
+    if desert not in CLASSIC_SPIRAL:
+        raise ValueError(f"desert must be a hex ID 0-18, got {desert!r}")
+    numbers: list[int | None] = [None] * len(CLASSIC_SPIRAL)
+    tokens = iter(CLASSIC_TOKENS)
+    for hex_id in CLASSIC_SPIRAL:
+        if hex_id != desert:
+            numbers[hex_id] = next(tokens)
+    return Board(numbers)

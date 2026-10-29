@@ -4,7 +4,7 @@ Covers:
 - geometry: 19 hexes, 54 vertices, 72 edges, rows of 3-4-5-4-3
 - adjacency: hex <-> vertex links, vertex neighbours, shared corners
 - scoring: dice weights, vertex values, desert = 0
-- generation: token counts, seeds, "separated" vs "random" modes, bad input
+- generation: token counts, seeds, "separated" vs "random" vs "classic" modes, bad input
 """
 
 from collections import Counter
@@ -12,10 +12,13 @@ from collections import Counter
 import pytest
 
 from src.board import (
+    CLASSIC_SPIRAL,
+    CLASSIC_TOKENS,
     DICE_WEIGHTS,
     NUMBER_TOKENS,
     Board,
     BoardGenerationError,
+    classic_board,
     generate_board,
 )
 
@@ -143,7 +146,7 @@ def test_geometry_is_identical_across_boards():
 # --- Tokens and scoring ---------------------------------------------------------
 
 
-@pytest.mark.parametrize("mode", ["random", "separated"])
+@pytest.mark.parametrize("mode", ["random", "separated", "classic"])
 def test_number_distribution_preserved(mode):
     # Every board: exactly one desert + the 18 standard tokens.
     for seed in range(50):
@@ -216,10 +219,45 @@ def test_separated_generation_fails_cleanly_when_attempts_exhausted():
             generate_board(seed, "separated", max_attempts=1)
 
 
+def test_classic_spiral_visits_every_hex_through_neighbours():
+    board = classic_board()
+    assert sorted(CLASSIC_SPIRAL) == list(range(19))
+    for a, b in zip(CLASSIC_SPIRAL, CLASSIC_SPIRAL[1:]):
+        assert b in board.hexes[a].neighbors
+
+
+def test_classic_board_with_centre_desert_matches_rulebook():
+    # Tokens A-R in spiral order; the centre hex (9) is the desert.
+    numbers = classic_board().numbers
+    assert numbers[9] is None
+    assert [numbers[h] for h in CLASSIC_SPIRAL[:-1]] == list(CLASSIC_TOKENS)
+
+
+@pytest.mark.parametrize("desert", range(19))
+def test_classic_board_skips_the_desert_and_keeps_6_8_apart(desert):
+    board = classic_board(desert)
+    assert board.numbers[desert] is None
+    assert [board.numbers[h] for h in CLASSIC_SPIRAL if h != desert] == list(CLASSIC_TOKENS)
+    assert not board.has_adjacent_high_numbers()
+
+
+def test_classic_mode_seed_only_moves_the_desert():
+    deserts = set()
+    for seed in range(100):
+        board = generate_board(seed, "classic")
+        assert board.numbers == generate_board(seed, "classic").numbers
+        desert = board.numbers.index(None)
+        assert board.numbers == classic_board(desert).numbers
+        deserts.add(desert)
+    assert len(deserts) > 1
+
+
 def test_invalid_inputs_rejected():
-    # Unknown mode, 18 tiles instead of 19, and a 7 token are all rejected.
+    # Unknown mode, 18 tiles instead of 19, a 7 token and an off-board desert are all rejected.
     with pytest.raises(ValueError):
         generate_board(0, "bogus")
+    with pytest.raises(ValueError):
+        classic_board(19)
     with pytest.raises(ValueError):
         Board([None] * 18)
     with pytest.raises(ValueError):
