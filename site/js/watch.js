@@ -6,7 +6,7 @@
 //                 ("Catan: Classic Scenario" = rulebook token spiral; the seed only places the desert)
 //   next()      - one CPU move in both games, then redraw
 //   autoplay    - repeats next() on a timer until both games end
-//   render()    - boards, scoreboards, move logs, status line
+//   render()    - boards, scoreboards, move logs
 
 import { loadEngine, randomSeed } from "./engine.js";
 import { drawBoard, renderScores, describeMove, resultText } from "./board.js";
@@ -44,8 +44,6 @@ function start() {
     board = data.board;
     states[draft] = data.state;
   }
-  const setup = classic ? "Catan: Classic Scenario (the seed places the desert)" : `${mode} board`;
-  ui.status.textContent = `Seed ${seed}, ${setup}. Press Next Move or Autoplay.`;
   render();
 }
 
@@ -54,12 +52,6 @@ function start() {
 function next() {
   if (states.snake.is_over) return;
   for (const draft of DRAFTS) states[draft] = engine.step(draft).state;
-  const s = states.snake.moves.at(-1);
-  const t = states.standard.moves.at(-1);
-  const owners = s.player === t.player ? `both give it to player ${s.player}`
-                                       : `snake gives it to ${s.player}, standard to ${t.player}`;
-  ui.status.textContent = `Turn ${s.turn}: spot ${s.vertex} (value ${s.value}) is taken; ${owners}.`
-    + (states.snake.is_over ? ` Game over. Snake: ${resultText(states.snake)}. Standard: ${resultText(states.standard)}.` : "");
   render();
   if (states.snake.is_over) stopAutoplay();
 }
@@ -115,6 +107,7 @@ async function init() {
     return;
   }
   document.querySelectorAll("[data-needs-engine]").forEach((el) => { el.disabled = false; });
+  ui.status.hidden = true;
   start();
 }
 

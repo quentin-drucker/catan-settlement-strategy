@@ -2,7 +2,8 @@
 <!--
   play.html: draft against three greedy computer players.
   Key parts:
-  - controls: your seat, draft order, board type, seed, show values, New game
+  - controls: your seat, draft order, board type, seed (own number or Catan: Classic
+    Scenario), show values, New Game
   - status line: whose turn, what to do, why a pick was refused, final result
   - the board (open spots are clickable on your turn), scoreboard and move log
   The game runs in the browser: js/engine.js loads the Python engine (src/*.py)
@@ -40,48 +41,60 @@
 
   <main id="main" class="page">
 
-    <!-- Intro: the rules in two sentences. -->
+    <!-- Intro: what's on this page. -->
     <h1>Play</h1>
     <p class="lede">
-      Pick two settlement spots against three greedy computer players. A spot is worth the dice
-      weights of the tiles around it, and no spot may sit right next to a settlement.
+      Your turn! In addition to the functions explained in the “Watch” tab, you also have the power to
+      change your seat in the draft and the draft type. Try to maximize your score by picking spots that
+      border multiple high-probability tiles. Good luck!
     </p>
     <div class="ornament" aria-hidden="true"><span class="ornament__hex"></span></div>
 
     <!-- Controls. Changing seat, draft, board or seed starts a new game. -->
     <div class="controls wide">
-      <label class="field">
-        <span class="field__label">Your seat</span>
-        <select class="field__input" id="play-seat" disabled data-needs-engine>
-          <option value="A" selected>A (picks first)</option>
-          <option value="B">B</option>
-          <option value="C">C</option>
-          <option value="D">D (picks fourth)</option>
-        </select>
-      </label>
-      <label class="field">
-        <span class="field__label">Draft</span>
-        <select class="field__input" id="play-draft" disabled data-needs-engine>
-          <option value="snake" selected>Snake (A B C D D C B A)</option>
-          <option value="standard">Standard (A B C D A B C D)</option>
-        </select>
-      </label>
-      <label class="field">
-        <span class="field__label">Board</span>
-        <select class="field__input" id="play-board" disabled data-needs-engine>
-          <option value="separated" selected>Separated (no 6/8 together)</option>
-          <option value="random">Random</option>
-        </select>
-      </label>
-      <label class="field">
-        <span class="field__label">Seed</span>
-        <input class="field__input field__input--short" id="play-seed" type="number" min="0" step="1" placeholder="random" disabled data-needs-engine>
-      </label>
-      <label class="field field--check">
-        <input id="play-values" type="checkbox" disabled data-needs-engine>
-        <span>Show spot values</span>
-      </label>
-      <button class="button button--primary" id="play-new" type="button" disabled data-needs-engine>New game</button>
+      <div class="controls__row controls__row--center">
+        <label class="field">
+          <span class="field__label">Your seat</span>
+          <select class="field__input" id="play-seat" disabled data-needs-engine>
+            <option value="A" selected>A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">Draft</span>
+          <select class="field__input" id="play-draft" disabled data-needs-engine>
+            <option value="snake" selected>Snake</option>
+            <option value="standard">Standard</option>
+          </select>
+        </label>
+      </div>
+      <div class="controls__row">
+        <label class="field">
+          <span class="field__label">Board</span>
+          <select class="field__input" id="play-board" disabled data-needs-engine>
+            <option value="separated" selected>Separated</option>
+            <option value="random">Random</option>
+          </select>
+        </label>
+        <div class="field" role="group" aria-labelledby="play-seed-label">
+          <span class="field__label" id="play-seed-label">Seed</span>
+          <div class="field__row">
+            <select class="field__input field__input--source" id="play-seed-source" aria-label="Seed source" disabled data-needs-engine>
+              <option value="own" selected>Enter your own</option>
+              <option value="classic">Catan: Classic Scenario</option>
+            </select>
+            <input class="field__input field__input--short" id="play-seed" type="text" inputmode="numeric"
+                   pattern="[0-9]*" placeholder="random" aria-label="Seed number" disabled data-needs-engine>
+          </div>
+        </div>
+        <label class="field field--check">
+          <input id="play-values" type="checkbox" disabled data-needs-engine>
+          <span>Show spot values</span>
+        </label>
+        <button class="button button--primary" id="play-new" type="button" disabled data-needs-engine>New Game</button>
+      </div>
     </div>
 
     <!-- Status: read out by screen readers when it changes (aria-live). -->
@@ -108,17 +121,6 @@
         <ol class="move-log" id="play-log"></ol>
       </section>
     </div>
-
-    <!-- Tips. -->
-    <h2>Tips</h2>
-    <ul>
-      <li>Hover over a spot (or turn on "Show spot values") to see what it's worth: tiles 8, 5 and 9 make 5 + 4 + 4 = 13.</li>
-      <li>Taking a spot also blocks its neighbours for everyone, including you. Blocking a strong spot an opponent wants can pay off.</li>
-      <li>Keyboard: Tab moves between open spots on your turn; Enter or Space picks one.</li>
-      <li>The seed is shown above the board; the same seed always gives the same board. Computer moves can
-        differ from a computer-only game once you pick, because ties between equal spots are broken in a
-        different order.</li>
-    </ul>
   </main>
 
   <!-- Footer (same on every page). -->

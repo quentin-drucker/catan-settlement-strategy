@@ -5,7 +5,7 @@
   - intro beside "Things to Note" (how the controls work)
   - controls: seed (own number or Catan: Classic Scenario), board type, Next Move,
     Autoplay, Restart, New Board
-  - status line (read out by screen readers as it changes)
+  - status line: only while the engine loads, or if it fails
   - two board panels, each with whose turn it is, a scoreboard and a move log
   The game runs in the browser: js/engine.js loads the Python engine (src/*.py)
   with Pyodide; js/board.js draws the boards; js/watch.js runs this page.
@@ -67,31 +67,33 @@
 
     <!-- Controls. Buttons start disabled and switch on once the engine has loaded. -->
     <div class="controls wide">
-      <div class="field" role="group" aria-labelledby="watch-seed-label">
-        <span class="field__label" id="watch-seed-label">Seed</span>
-        <div class="field__row">
-          <select class="field__input" id="watch-seed-source" aria-label="Seed source">
-            <option value="own" selected>Enter your own</option>
-            <option value="classic">Catan: Classic Scenario</option>
-          </select>
-          <input class="field__input field__input--short" id="watch-seed" type="text" inputmode="numeric"
-                 pattern="[0-9]*" value="42" aria-label="Seed number">
+      <div class="controls__row">
+        <div class="field" role="group" aria-labelledby="watch-seed-label">
+          <span class="field__label" id="watch-seed-label">Seed</span>
+          <div class="field__row">
+            <select class="field__input field__input--source" id="watch-seed-source" aria-label="Seed source">
+              <option value="own" selected>Enter your own</option>
+              <option value="classic">Catan: Classic Scenario</option>
+            </select>
+            <input class="field__input field__input--short" id="watch-seed" type="text" inputmode="numeric"
+                   pattern="[0-9]*" value="42" aria-label="Seed number">
+          </div>
         </div>
+        <label class="field">
+          <span class="field__label">Board</span>
+          <select class="field__input" id="watch-board">
+            <option value="separated" selected>Separated</option>
+            <option value="random">Random</option>
+          </select>
+        </label>
+        <button class="button button--primary" id="watch-next" type="button" disabled data-needs-engine>Next Move</button>
+        <button class="button button--secondary" id="watch-auto" type="button" aria-pressed="false" disabled data-needs-engine>Autoplay</button>
+        <button class="button button--secondary" id="watch-restart" type="button" disabled data-needs-engine>Restart</button>
+        <button class="button button--secondary" id="watch-new" type="button" disabled data-needs-engine>New Board</button>
       </div>
-      <label class="field">
-        <span class="field__label">Board</span>
-        <select class="field__input" id="watch-board">
-          <option value="separated" selected>Separated (no 6/8 together)</option>
-          <option value="random">Random</option>
-        </select>
-      </label>
-      <button class="button button--primary" id="watch-next" type="button" disabled data-needs-engine>Next Move</button>
-      <button class="button button--secondary" id="watch-auto" type="button" aria-pressed="false" disabled data-needs-engine>Autoplay</button>
-      <button class="button button--secondary" id="watch-restart" type="button" disabled data-needs-engine>Restart</button>
-      <button class="button button--secondary" id="watch-new" type="button" disabled data-needs-engine>New Board</button>
     </div>
 
-    <!-- Status: loading message, then a sentence per move. aria-live = read out when it changes. -->
+    <!-- Status: loading message, hidden once the engine is ready; also shows load errors. aria-live = read out when it changes. -->
     <p class="status wide" id="watch-status" aria-live="polite">
       Loading the Python game engine. The first visit downloads about 12 MB, so it can take a few seconds.
     </p>

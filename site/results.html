@@ -42,15 +42,11 @@
     <!-- Intro: what was run and how precise the numbers are. -->
     <h1>Results</h1>
     <p class="lede">
-      400,000 simulated games: the snake and standard drafts, each played on 100,000
-      separated boards and 100,000 random boards. Every margin below is a 95% confidence
-      interval of &plusmn;0.01 points or less, so the differences are real for these players.
-    </p>
-    <p>
-      All four players are greedy computer players: each turn they take the open spot worth the
-      most right now. Payoff = the dice weights around a player's two settlements, i.e. expected
-      production, not actual resources. Snake and standard play the same boards (same seeds),
-      so the draft order is the only difference between them.
+      These results come from 400,000 simulated games. The snake draft and the standard draft were
+      each played on 100,000 'traditional separated' boards and 100,000 'true random' boards. All four
+      players follow a simple greedy rule, taking the highest-value open spot every turn. A player's
+      payoff is the total dice weight of the tiles around their two settlements. Each game uses the same
+      seed in both drafts, so the boards match and the draft order is the only difference.
     </p>
     <div class="ornament" aria-hidden="true"><span class="ornament__hex"></span></div>
 
@@ -95,12 +91,12 @@
       </table>
     </div>
     <p class="byline">
-      Fairness gap = highest seat average minus lowest. Avg spread = best minus worst payoff
-      inside one game, averaged over all games.
+      The fairness gap is how far apart the best and worst seats are, on average. The average
+      spread is how far apart the best and worst scores are inside a single game.
     </p>
 
     <!-- Experiment 1: draft position under snake, explained by pick values. -->
-    <h2>1. Why snake nearly evens things out</h2>
+    <h2>1. Why Snake Nearly Evens Things Out</h2>
     <figure class="figure panel wide">
       <img class="figure__img" src="results/pick_values.png" width="1500" height="720"
            alt="Stacked bars per seat showing first-pick and second-pick value. Snake: first picks fall from 12.5 (A) to 10.6 (D) while second picks rise from 8.2 (A) to 10.0 (D), totals 20.5 to 20.7. Standard: both picks fall from A to D, totals 22.4 to 18.8.">
@@ -109,15 +105,13 @@
       </figcaption>
     </figure>
     <ul>
-      <li>Picking earlier gets a better first spot: A 12.47, B 11.75, C 11.15, D 10.55.</li>
-      <li>Snake reverses the order for the second pick, so D (two picks in a row) gets the best
-        leftover and A the worst: A 8.24, B 8.80, C 9.38, D 9.97.</li>
-      <li>The two almost cancel. A's first-pick lead over D (1.92) is a little bigger than D's
-        second-pick lead over A (1.73), so A keeps a small edge of 0.19 points.</li>
+      <li>The earlier a seat picks, the better its first spot: A 12.47, B 11.75, C 11.15, and D 10.55.</li>
+      <li>In a snake draft the second round goes back the other way. D places twice in a row and takes the best leftover, and A takes the worst: A 8.24, B 8.80, C 9.38, and D 9.97.</li>
+      <li>Those two effects nearly balance. A's first-pick lead over D is 1.92, and D's second-pick lead over A is 1.73, so A is ahead by only 0.19 points.</li>
     </ul>
 
     <!-- Experiment 2: snake vs standard on identical boards. -->
-    <h2>2. Snake vs standard on the same boards</h2>
+    <h2>2. Snake vs Standard on the Same Boards</h2>
     <figure class="figure panel wide">
       <img class="figure__img" src="results/seat_payoffs.png" width="1200" height="720"
            alt="Grouped bars of mean payoff by seat. Snake: A 20.71, B 20.55, C 20.53, D 20.52. Standard: A 22.44, B 21.14, C 19.94, D 18.80.">
@@ -127,15 +121,10 @@
       </figcaption>
     </figure>
     <ul>
-      <li>Standard is a strict ladder: A 22.44 &gt; B 21.14 &gt; C 19.94 &gt; D 18.80.</li>
-      <li>Game by game on the same boards, snake shrinks the best-vs-worst spread by
-        <strong>2.16 &plusmn; 0.007</strong> points (separated boards) and 2.57 &plusmn; 0.008 (random boards).</li>
-      <li>Under standard, seat A can never score below anyone. Greedy pick values never go up
-        (good spots only disappear), so each of A's picks beats B's, B's beat C's, and so on.
-        A finished first, alone or tied, in all 100,000 games.</li>
-      <li>Both drafts take the exact same eight spots in the same order. The draft only decides
-        who gets each one, which is why the second-pick values in the two drafts are the same four
-        numbers handed to opposite seats.</li>
+      <li>Standard draft, from best to worst: A 22.44, B 21.14, C 19.94, D 18.80.</li>
+      <li>A snake draft shrinks the best-to-worst gap inside a game by 2.16 points on separated boards and 2.57 on random boards.</li>
+      <li>In a standard draft, A finished first, alone or tied, in all 100,000 games, because each later pick is worth no more than the one before it.</li>
+      <li>Both drafts take the same eight spots in the same order. Only the player who receives each spot changes.</li>
     </ul>
     <figure class="figure panel wide">
       <img class="figure__img" src="results/win_share.png" width="1200" height="720"
@@ -147,7 +136,7 @@
     </figure>
 
     <!-- Experiment 3: separated vs random boards. -->
-    <h2>3. Separated vs random boards</h2>
+    <h2>3. Separated vs Random Boards</h2>
     <figure class="figure panel wide">
       <img class="figure__img" src="results/fairness.png" width="1500" height="720"
            alt="Two bar charts. Fairness gap: snake 0.19 (separated) and 0.88 (random); standard 3.64 and 4.46. Average within-game spread: snake 1.48 and 1.89; standard 3.64 and 4.46.">
@@ -156,16 +145,13 @@
       </figcaption>
     </figure>
     <ul>
-      <li>Keeping 6s and 8s apart cuts the snake gap from 0.88 to 0.19, about four times smaller,
-        and the within-game spread from 1.89 to 1.48.</li>
-      <li>It helps under standard too (4.46 to 3.64), but standard stays far less balanced.</li>
-      <li>Likely reason: on random boards, 6s and 8s can sit together and form one very strong spot.
-        A's first pick is worth 13.39 there against 12.47 on separated boards, while the later
-        seats' picks barely change.</li>
+      <li>Separated boards cut the snake draft's fairness gap from 0.88 to 0.19, about four times smaller, and the gap inside a game from 1.89 to 1.48.</li>
+      <li>They help a standard draft too, from 4.46 to 3.64, but that draft stays much less balanced.</li>
+      <li>On random boards a 6 and an 8 can touch, which makes one very strong spot. A's first pick is worth 13.39 there, against 12.47 when 6s and 8s are kept apart. The later seats barely change.</li>
     </ul>
 
     <!-- Heatmap: which board positions get taken. -->
-    <h2>Where players settle</h2>
+    <h2>Where Players Settle</h2>
     <figure class="figure panel wide">
       <img class="figure__img" src="results/heatmap.png" width="1650" height="840"
            alt="Two hex-board heatmaps. Coast corners are rarely taken. The most-taken spots, about 37% of games each, form a ring around the centre hex. First picks follow the same ring at about 5% each.">
@@ -175,15 +161,13 @@
       </figcaption>
     </figure>
     <ul>
-      <li>Coast corners touch only one or two tiles and are almost never taken.</li>
-      <li>The most-taken spots, about 37% of games each, form a ring around the centre hex rather than
-        sitting on the centre hex's own corners. One possible reason: the centre corners are close
-        together, so one settlement there blocks several others. Not yet checked.</li>
+      <li>Coast corners touch only one or two tiles, so they are almost never taken.</li>
+      <li>The most-taken spots, about 37% of games each, form a ring around the centre hex rather than sitting on the centre hex's own corners.</li>
     </ul>
 
     <!-- Full tables: every seat statistic per setup (from results/summary.md). -->
-    <h2>Seat details</h2>
-    <p>Mean payoff (&plusmn; 95% CI), first and second pick value, and win share, per setup.</p>
+    <h2>Seat Details</h2>
+    <p>Each table gives a seat's average payoff, the value of its first and second picks, and its share of wins.</p>
     <div class="table-wrap panel wide">
       <table class="data-table data-table--compact">
         <caption>Snake draft, separated boards</caption>
@@ -235,17 +219,14 @@
 
     <!-- Reproduce: the exact commands behind every number on this page. -->
     <h2>Reproduce</h2>
-    <p>Rebuild every number and chart (about 5 minutes; same seeds give the same games):</p>
+    <p>Run this to rebuild every number and chart. It takes about 5 minutes, and the same seeds give the same games:</p>
     <pre class="command"><code>python main.py experiments --games 100000 --seed 0</code></pre>
-    <p>Replay any single game from the raw data by its seed, for example:</p>
+    <p>Replay any one game by its seed, for example:</p>
     <pre class="command"><code>python main.py play --seed 0 --board separated --draft snake</code></pre>
 
     <!-- Limits: what these results do and don't show. -->
     <div class="note">
-      <p><strong>Limits.</strong> These results describe greedy players, a simple heuristic, not
-        equilibrium play. Players who think ahead or block on purpose could change the picture, and
-        then the draft order would also change which spots get taken. The fairness gap is one measure
-        of balance between seats, not proof that a draft is fair in every sense.</p>
+      <p><strong>Limits.</strong> These results are for greedy players, who take the best open spot each turn and never block on purpose. Players who think ahead could change which spots get taken, and the fairness gap is one measure of balance between seats, not proof that a draft is fair in every sense.</p>
     </div>
   </main>
 
