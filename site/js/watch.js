@@ -71,14 +71,22 @@ function stopAutoplay() {
 }
 
 // Redraw both boards, their scoreboards and move logs.
+// "Split": both games take the same spot each turn; when the newest one went to
+// different players, both boards flash it and the turn lines say who got it where.
 function render() {
+  const s = states.snake.moves.at(-1);
+  const t = states.standard.moves.at(-1);
+  const split = Boolean(s && s.player !== t.player);
   for (const draft of DRAFTS) {
     const state = states[draft];
-    drawBoard($(`board-${draft}`), board, state, { label: `${draft} draft board` });
+    const [here, there, other] = draft === "snake" ? [s, t, "standard"] : [t, s, "snake"];
+    drawBoard($(`board-${draft}`), board, state, { label: `${draft} draft board`, split });
     renderScores($(`scores-${draft}`), state, board);
-    $(`turn-${draft}`).innerHTML = state.is_over
+    $(`turn-${draft}`).innerHTML = (state.is_over
       ? `Game over. ${resultText(state)}`
-      : `Turn ${state.moves.length + 1} of 8: ${playerChip(state.current, true)} picks next`;
+      : `Turn ${state.moves.length + 1} of 8: ${playerChip(state.current, true)} picks next`)
+      + (split ? ` <span class="split-badge">Split on turn ${here.turn}: ${playerChip(here.player)} here, `
+        + `${playerChip(there.player)} in ${other}</span>` : "");
     const log = $(`log-${draft}`);
     log.replaceChildren(...state.moves.map((m) => {
       const li = document.createElement("li");
