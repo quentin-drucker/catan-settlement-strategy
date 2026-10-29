@@ -77,7 +77,7 @@ async function runCpus(gen) {
   if (state.is_over) {
     finish();
   } else {
-    setStatus(`Your turn (player ${settings.seat}): pick one of the gold-ringed spots.`, "turn", settings.seat);
+    setStatus(`Your turn (player ${settings.seat}): pick one of the green-ringed spots.`, "turn", settings.seat);
   }
   render();
 }
@@ -88,7 +88,7 @@ function pick(spot) {
   const result = engine.place(KEY, spot);
   state = result.state;
   if (result.error) {
-    setStatus(`Not allowed: ${result.error}. Pick a gold-ringed spot.`, "error");
+    setStatus(`Not allowed: ${result.error}. Pick a green-ringed spot.`, "error");
     render();
     return;
   }
