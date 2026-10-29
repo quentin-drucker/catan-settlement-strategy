@@ -113,6 +113,7 @@
      box-shadow = a blurred copy of the box drawn underneath it. */
   --shadow-card: 0 1px 1px rgba(60, 42, 14, 0.06), 0 8px 18px -12px rgba(60, 42, 14, 0.35);
   --shadow-card-hover: 0 2px 2px rgba(60, 42, 14, 0.08), 0 16px 26px -14px rgba(60, 42, 14, 0.45);
+  --shadow-lift: 0 5px 9px -4px rgba(60, 42, 14, 0.4);   /* small piece lifted on hover (tokens) */
   --frame-inset: inset 0 0 0 5px var(--color-card), inset 0 0 0 6px var(--color-gilt);
 
   /* Parchment texture, drawn by the browser from small inline SVG tiles (no image
@@ -219,7 +220,13 @@ h2 { font-size: var(--text-2xl); }
   height: 0.9rem;
   background: var(--color-box-red);
   clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  transition: transform 0.5s ease;
 }
+/* Hovering a heading turns its hex a sixth of a turn (a hex looks the same after 60deg). */
+.page:not(.page--intro) > h1:hover::before,
+.page > h2:hover::before,
+.card-grid h1:hover::before,
+.card-grid h2:hover::before { transform: rotate(60deg); }
 .page > h2:nth-of-type(3n+2)::before { background: var(--color-box-yellow); }
 .page > h2:nth-of-type(3n)::before { background: var(--color-box-green); }
 /* Play and Results already spend red on the page title, so their sections start at yellow. */
@@ -312,7 +319,10 @@ strong { font-weight: 600; }
   fill: none;
   stroke: var(--color-token);
   stroke-width: 2.5;
+  transition: transform 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
+.brand:hover .brand__mark,
+.brand:focus-visible .brand__mark { transform: rotate(60deg); }
 
 /* Page links as tabs. aria-current="page" marks the page being viewed (also
    read out by screen readers). The box-colour ribbon sits just below them. */
@@ -434,7 +444,12 @@ strong { font-weight: 600; }
   height: 0.92rem;
   background: var(--color-token);
   clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  animation: hex-spin-in 1.1s cubic-bezier(0.34, 1.3, 0.64, 1) 0.2s both;   /* once, on page load */
+  transition: transform 0.6s ease;
 }
+/* `rotate` (load) and `transform` (hover) are separate properties, so they don't fight. */
+.ornament:hover .ornament__hex { transform: rotate(60deg); }
+@keyframes hex-spin-in { from { rotate: -120deg; scale: 0.4; opacity: 0; } }
 
 /* Buttons: links styled as buttons, for the main actions on a page.
    .button--primary = dark with a thin gold inner line (game-box trim);
@@ -504,6 +519,8 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   color: var(--color-ink);
   font-variant-numeric: lining-nums tabular-nums;
 }
+.token { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.token:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
 .token--high { color: var(--color-token); }
 /* Pips = the dots under a token's number; count = ways to roll it out of 36. */
 .token__pips {
@@ -727,6 +744,17 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   to   { background: color-mix(in srgb, var(--player) 32%, transparent); }
 }
 .board-panel .table-wrap { margin: var(--space-3) 0; }
+/* Watch: "Split on turn 5: [D] here, [A] in standard" beside the turn line. */
+.split-badge {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-box-red);
+  border-radius: var(--radius-sm);
+  color: var(--color-box-red);
+  font-weight: 600;
+  font-size: var(--text-xs);
+}
 
 /* Move log: numbered list of moves so far, small print. */
 .move-log {
@@ -779,6 +807,26 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   transition: fill 0.2s ease;
 }
 .board__tile:hover { fill: var(--board-tile-hover); }
+/* Play: the tiles a hovered/focused open spot collects from, tinted gold like its ring. */
+.board__tile--lit { fill: color-mix(in srgb, var(--color-token) 20%, var(--board-tile-hover)); }
+/* New board: tiles ripple out from the middle, each token pops in after its tile,
+   then the spots fade in. Delays are set per shape in board.js. */
+.board__tile--in,
+.board__token-group--in { transform-box: fill-box; transform-origin: center; }
+.board__tile--in { animation: tile-in 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) both; }
+.board__token-group--in { animation: token-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.board__fade-in { animation: fade-in 0.35s ease-out both; }
+@keyframes tile-in { from { opacity: 0; transform: scale(0.6); } }
+@keyframes token-in { from { opacity: 0; transform: scale(0.4); } }
+@keyframes fade-in { from { opacity: 0; } }
+/* New move: the tiles that pay the new settlement flash in the player's color
+   (after .board__tile--in, so it wins if both are on). */
+.board__tile--flash { animation: tile-flash 0.9s ease-out; }
+/* Explicit `to`: Chromium blends a color-mix() keyframe from black when the end is left implicit. */
+@keyframes tile-flash {
+  from { fill: color-mix(in srgb, var(--player) 40%, white); }   /* pastel of the player color */
+  to   { fill: var(--board-tile); }
+}
 /* Tokens let the mouse through, so hovering a token still lights its tile. */
 .board__token, .board__token-number, .board__pip { pointer-events: none; }
 .board__token {
@@ -803,6 +851,16 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
 .board__spot--blocked {
   fill: var(--board-blocked);
   stroke: none;
+}
+/* Spots next to a new settlement shrink from an open spot into a blocked dot. */
+.board__spot--fading {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spot-block 0.5s ease-out both;
+}
+@keyframes spot-block {
+  from { fill: var(--board-spot); stroke: var(--board-spot-edge); stroke-width: 1.2; transform: scale(1.45); }
+  to   { fill: var(--board-blocked); stroke: var(--board-spot-edge); stroke-width: 0; transform: none; }
 }
 /* Play page: an open spot the human can pick. Green ring, so it doesn't read as a
    token; grows and turns gold on hover or keyboard focus so it's obvious what can be clicked. */
@@ -851,6 +909,31 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   from { transform: translateY(-14px) scale(0.6); opacity: 0; }
   to   { transform: none; opacity: 1; }
 }
+/* Watch: the newest spot went to different players on the two boards, so a red
+   ring pulses out of it three times (both boards). */
+.board__split { fill: none; stroke: var(--color-box-red); stroke-width: 2.5; opacity: 0; }
+.board__split--on {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: split-pulse 0.5s ease-out 3;
+}
+@keyframes split-pulse {
+  from { opacity: 0.9; transform: scale(0.9); }
+  to   { opacity: 0; transform: scale(1.9); }
+}
+/* Game over: the winners' houses glow softly in their color and sway a few
+   degrees from their base, slowly, so they read as "won" without pulling focus. */
+.board__winner {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 0 3px var(--player));
+  animation: winner-sway 3.2s ease-in-out 0.5s infinite;
+}
+@keyframes winner-sway {
+  0%, 100% { transform: none; }
+  25%      { transform: translateY(-1px) rotate(-3.5deg); }
+  75%      { transform: translateY(-1px) rotate(3.5deg); }
+}
 .board__piece { stroke: var(--board-spot); stroke-width: 2; }
 .board__piece--a { fill: var(--player-a); }
 .board__piece--b { fill: var(--player-b); }
@@ -875,6 +958,20 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
 .page--intro .panel h3 { margin-top: 0; }
 .page--intro .panel ul { margin-bottom: 0; }
 
+/* Page change: a short cross-fade between pages (browsers without View Transitions just switch). */
+@view-transition { navigation: auto; }
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: 0.25s; }
+
+/* Scroll reveal: sections that start below the fold fade and rise into place the
+   first time they scroll into view (js/reveal.js adds the classes). */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal--in { opacity: 1; transform: none; }
+
 /* Phones: smaller page title and tokens. */
 @media (max-width: 34rem) {
   :root {
@@ -897,4 +994,12 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   .board__spot-button:hover .board__spot,
   .board__spot-button:focus .board__spot { transform: none; }
   .board__last, .board__new, .player-chip--active, .score-row--winner { animation: none; }
+  .board__tile--in, .board__token-group--in, .board__fade-in, .board__tile--flash,
+  .board__spot--fading, .board__split--on, .board__winner, .ornament__hex { animation: none; }
+  .token, .brand__mark, .ornament__hex, .page h1::before, .page h2::before { transition: none; }
+  .token:hover { transform: none; }
+  .brand:hover .brand__mark, .ornament:hover .ornament__hex,
+  .page h1:hover::before, .page h2:hover::before { transform: none; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  @view-transition { navigation: none; }
 }
