@@ -136,7 +136,7 @@
     </figure>
 
     <!-- Experiment 3: separated vs random boards. -->
-    <h2>3. Separated vs random boards</h2>
+    <h2>3. Separated vs Random Boards</h2>
     <figure class="figure panel wide">
       <img class="figure__img" src="results/fairness.png" width="1500" height="720"
            alt="Two bar charts. Fairness gap: snake 0.19 (separated) and 0.88 (random); standard 3.64 and 4.46. Average within-game spread: snake 1.48 and 1.89; standard 3.64 and 4.46.">
@@ -145,12 +145,9 @@
       </figcaption>
     </figure>
     <ul>
-      <li>Keeping 6s and 8s apart cuts the snake gap from 0.88 to 0.19, about four times smaller,
-        and the within-game spread from 1.89 to 1.48.</li>
-      <li>It helps under standard too (4.46 to 3.64), but standard stays far less balanced.</li>
-      <li>Likely reason: on random boards, 6s and 8s can sit together and form one very strong spot.
-        A's first pick is worth 13.39 there against 12.47 on separated boards, while the later
-        seats' picks barely change.</li>
+      <li>Separated boards cut the snake draft's fairness gap from 0.88 to 0.19, about four times smaller, and the gap inside a game from 1.89 to 1.48.</li>
+      <li>They help a standard draft too, from 4.46 to 3.64, but that draft stays much less balanced.</li>
+      <li>On random boards a 6 and an 8 can touch, which makes one very strong spot. A's first pick is worth 13.39 there, against 12.47 when 6s and 8s are kept apart. The later seats barely change.</li>
     </ul>
 
     <!-- Heatmap: which board positions get taken. -->
