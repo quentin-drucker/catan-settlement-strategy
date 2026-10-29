@@ -9,7 +9,7 @@
 //   render()    - boards, scoreboards, move logs
 
 import { loadEngine, randomSeed } from "./engine.js";
-import { drawBoard, renderScores, describeMove, resultText } from "./board.js";
+import { drawBoard, renderScores, describeMove, resultText, playerChip } from "./board.js";
 
 const DRAFTS = ["snake", "standard"];
 const AUTOPLAY_MS = 1100;   // pause between automatic moves: slow enough to follow
@@ -76,13 +76,13 @@ function render() {
     const state = states[draft];
     drawBoard($(`board-${draft}`), board, state, { label: `${draft} draft board` });
     renderScores($(`scores-${draft}`), state, board);
-    $(`turn-${draft}`).textContent = state.is_over
+    $(`turn-${draft}`).innerHTML = state.is_over
       ? `Game over. ${resultText(state)}`
-      : `Turn ${state.moves.length + 1} of 8: player ${state.current} picks next`;
+      : `Turn ${state.moves.length + 1} of 8: ${playerChip(state.current, true)} picks next`;
     const log = $(`log-${draft}`);
     log.replaceChildren(...state.moves.map((m) => {
       const li = document.createElement("li");
-      li.textContent = describeMove(m);
+      li.innerHTML = describeMove(m);
       return li;
     }));
   }

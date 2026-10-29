@@ -116,12 +116,23 @@ export function drawBoard(svg, board, state, options = {}) {
       .map(([dx, dy]) => `${(x + dx).toFixed(1)},${(y + dy).toFixed(1)}`).join(" ");
     const piece = svgEl("polygon", { class: `board__piece board__piece--${name.toLowerCase()}`, points: house });
     piece.append(svgEl("title", {}, `Player ${name}, spot ${id}`));
-    svg.append(piece);
-    svg.append(svgEl("text", { class: "board__piece-label", x, y: y + 5 }, name));
+    // House + letter in one group so the newest one can animate as a unit (.board__new).
+    const group = svgEl("g", Number(id) === lastMove ? { class: "board__new" } : {});
+    group.append(piece, svgEl("text", { class: "board__piece-label", x, y: y + 5 }, name));
+    svg.append(group);
   }
 }
 
+// The seat letter on its player color (same colors as the pieces), as HTML.
+// `active` adds a soft pulse for the player whose turn it is.
+export const playerChip = (name, active = false) =>
+  `<span class="player-chip player-chip--${name.toLowerCase()}${active ? " player-chip--active" : ""}">${name}</span>`;
+
+// CSS value for a player's color, e.g. "var(--player-b)".
+export const playerColor = (name) => `var(--player-${name.toLowerCase()})`;
+
 // Scoreboard rows: one per player with a coloured chip, settlements and payoff.
+// The row of the player whose turn it is gets tinted in their color.
 export function renderScores(tbody, state, board) {
   const values = new Map(board.vertices.map((v) => [v.id, v.value]));
   tbody.replaceChildren();
@@ -129,8 +140,12 @@ export function renderScores(tbody, state, board) {
     const row = document.createElement("tr");
     const spots = p.settlements.map((s) => `${s} (${values.get(s)})`).join(" + ") || "none yet";
     const winner = state.winners.includes(p.name);
+    if (p.name === state.current) {                // null once the game is over
+      row.className = "score-row--current";
+      row.style.setProperty("--player", playerColor(p.name));
+    }
     row.innerHTML = `
-      <th scope="row"><span class="player-chip player-chip--${p.name.toLowerCase()}">${p.name}</span></th>
+      <th scope="row">${playerChip(p.name)}</th>
       <td>${p.kind}</td>
       <td>${spots}</td>
       <td class="num">${p.payoff}${winner ? " &#9733;" : ""}</td>`;
@@ -138,8 +153,8 @@ export function renderScores(tbody, state, board) {
   }
 }
 
-// "Player A takes spot 22 (value 12)" for one move.
-export const describeMove = (m) => `Turn ${m.turn}: player ${m.player} takes spot ${m.vertex} (value ${m.value})`;
+// "Turn 3: [A] takes spot 22 (value 12)" for one move, as HTML (the letter is a chip).
+export const describeMove = (m) => `Turn ${m.turn}: ${playerChip(m.player)} takes spot ${m.vertex} (value ${m.value})`;
 
 // Winner line once a game is over.
 export function resultText(state) {

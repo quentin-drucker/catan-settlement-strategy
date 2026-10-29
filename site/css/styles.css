@@ -58,11 +58,12 @@
 
   /* Game board (used by .board; ready for the Watch/Play pages) */
   --board-sea: #D3E0E6;          /* water around the island */
-  --board-tile: #E7E2D4;         /* land hexes (no resources in this model) */
-  --board-tile-edge: #C4BCA8;
+  --board-tile: #D5E2C3;         /* land hexes: washed-out grass green (no resources in this model) */
+  --board-tile-hover: #E2ECD5;   /* tile under the mouse */
+  --board-tile-edge: #A9BE97;
   --board-spot: #FFFFFF;         /* empty settlement spot */
   --board-spot-edge: #554B42;
-  --board-blocked: #C4BCA8;      /* spot next to a settlement */
+  --board-blocked: #A9BE97;      /* spot next to a settlement (matches the tile edge) */
   --board-token-face: var(--color-token-face);
   --board-token-ink: var(--color-ink);
   --board-token-high: var(--color-token);
@@ -668,13 +669,13 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   padding: var(--space-3) var(--space-4);
   background: var(--color-card);
   border: 1px solid var(--color-card-edge);
-  border-left: 3px solid var(--color-token);
+  border-left: 3px solid var(--player, var(--color-token));   /* --player: whose turn (Play) */
   border-radius: var(--radius-sm);
   font-family: var(--font-ui);
   font-size: var(--text-sm);
 }
 .status--error { border-left-color: var(--color-error); color: var(--color-error); }
-.status--turn { border-left-color: var(--player-a); font-weight: 600; }  /* "your turn" on Play */
+.status--turn { font-weight: 600; }  /* "your turn" on Play */
 
 /* Board pair: two boards side by side (Watch); stacks on narrow screens. */
 .board-pair {
@@ -706,6 +707,9 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   font-size: var(--text-sm);
   color: var(--color-ink-muted);
 }
+/* Scoreboard row of the player whose turn it is: tinted in their color, with a bar. */
+.score-row--current { background: color-mix(in srgb, var(--player) 14%, transparent); }
+.score-row--current th { box-shadow: inset 3px 0 0 var(--player); }
 .board-panel .table-wrap { margin: var(--space-3) 0; }
 
 /* Move log: numbered list of moves so far, small print. */
@@ -729,10 +733,16 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   font-weight: 600;
   text-align: center;
 }
-.player-chip--a { background: var(--player-a); }
-.player-chip--b { background: var(--player-b); }
-.player-chip--c { background: var(--player-c); }
-.player-chip--d { background: var(--player-d); }
+/* Whose turn it is: a soft ring pulses out of the chip. */
+.player-chip--active { animation: chip-pulse 1.4s ease-out infinite; }
+@keyframes chip-pulse {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--player) 60%, transparent); }
+  to   { box-shadow: 0 0 0 6px transparent; }
+}
+.player-chip--a { --player: var(--player-a); background: var(--player); }
+.player-chip--b { --player: var(--player-b); background: var(--player); }
+.player-chip--c { --player: var(--player-c); background: var(--player); }
+.player-chip--d { --player: var(--player-d); background: var(--player); }
 
 /* Board: SVG drawing of the 19-hex board (sea, tiles, tokens, settlement spots,
    pieces). Styled here so every theme recolours it. Ready for the Watch/Play
@@ -750,7 +760,11 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   fill: var(--board-tile);
   stroke: var(--board-tile-edge);
   stroke-width: 1.5;
+  transition: fill 0.2s ease;
 }
+.board__tile:hover { fill: var(--board-tile-hover); }
+/* Tokens let the mouse through, so hovering a token still lights its tile. */
+.board__token, .board__token-number, .board__pip { pointer-events: none; }
 .board__token {
   fill: var(--board-token-face);
   stroke: var(--board-token-high);
@@ -778,11 +792,18 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
    keyboard focus so it's obvious what can be clicked. */
 .board__spot-button { cursor: pointer; }
 .board__hit { fill: transparent; }   /* invisible bigger tap area around an open spot */
-.board__spot-button .board__spot { stroke: var(--color-token); stroke-width: 2; }
+.board__spot-button .board__spot {
+  stroke: var(--color-token);
+  stroke-width: 2;
+  transform-box: fill-box;       /* scale each spot around its own centre */
+  transform-origin: center;
+  transition: transform 0.18s ease, stroke-width 0.18s ease, fill 0.18s ease;
+}
 .board__spot-button:hover .board__spot,
 .board__spot-button:focus .board__spot {
   fill: var(--color-token-face);
   stroke-width: 3.5;
+  transform: scale(1.4);
 }
 .board__spot-button:focus { outline: none; }    /* the thicker gold ring is the focus mark */
 /* Spot value written on an open spot ("Show values" option). */
@@ -800,6 +821,18 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   stroke: var(--color-token);
   stroke-width: 2.5;
   stroke-dasharray: 4 3;
+  animation: board-ring 3s linear infinite;   /* dashes slowly march around */
+}
+@keyframes board-ring { to { stroke-dashoffset: -28; } }
+/* Newest settlement drops onto its spot with a small bounce. */
+.board__new {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: board-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes board-drop {
+  from { transform: translateY(-14px) scale(0.6); opacity: 0; }
+  to   { transform: none; opacity: 1; }
 }
 .board__piece { stroke: var(--board-spot); stroke-width: 2; }
 .board__piece--a { fill: var(--player-a); }
@@ -843,4 +876,8 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   .button { transition: none; }
   .button:hover { transform: none; }
   .button:disabled { transform: none; }
+  .board__tile, .board__spot-button .board__spot { transition: none; }
+  .board__spot-button:hover .board__spot,
+  .board__spot-button:focus .board__spot { transform: none; }
+  .board__last, .board__new, .player-chip--active { animation: none; }
 }
