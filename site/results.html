@@ -219,17 +219,14 @@
 
     <!-- Reproduce: the exact commands behind every number on this page. -->
     <h2>Reproduce</h2>
-    <p>Rebuild every number and chart (about 5 minutes; same seeds give the same games):</p>
+    <p>Run this to rebuild every number and chart. It takes about 5 minutes, and the same seeds give the same games:</p>
     <pre class="command"><code>python main.py experiments --games 100000 --seed 0</code></pre>
-    <p>Replay any single game from the raw data by its seed, for example:</p>
+    <p>Replay any one game by its seed, for example:</p>
     <pre class="command"><code>python main.py play --seed 0 --board separated --draft snake</code></pre>
 
     <!-- Limits: what these results do and don't show. -->
     <div class="note">
-      <p><strong>Limits.</strong> These results describe greedy players, a simple heuristic, not
-        equilibrium play. Players who think ahead or block on purpose could change the picture, and
-        then the draft order would also change which spots get taken. The fairness gap is one measure
-        of balance between seats, not proof that a draft is fair in every sense.</p>
+      <p><strong>Limits.</strong> These results are for greedy players, who take the best open spot each turn and never block on purpose. Players who think ahead could change which spots get taken, and the fairness gap is one measure of balance between seats, not proof that a draft is fair in every sense.</p>
     </div>
   </main>
 
