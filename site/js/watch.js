@@ -3,6 +3,7 @@
 //
 // Key parts:
 //   start()     - new pair of games for the chosen seed + board type
+//                 ("Catan: Classic Scenario" = rulebook token spiral; the seed only places the desert)
 //   next()      - one CPU move in both games, then redraw
 //   autoplay    - repeats next() on a timer until both games end
 //   render()    - boards, scoreboards, move logs, status line
@@ -16,6 +17,7 @@ const AUTOPLAY_MS = 1100;   // pause between automatic moves: slow enough to fol
 const $ = (id) => document.getElementById(id);
 const ui = {
   status: $("watch-status"),
+  seedSource: $("watch-seed-source"),
   seed: $("watch-seed"),
   mode: $("watch-board"),
   next: $("watch-next"),
@@ -32,13 +34,18 @@ let timer = null;                         // autoplay interval id (null = paused
 // Start a fresh pair of games from the seed + board type in the controls.
 function start() {
   stopAutoplay();
-  const seed = Number(ui.seed.value) || 0;
+  const seed = Math.max(0, parseInt(ui.seed.value, 10) || 0);
+  ui.seed.value = seed;                   // show the seed actually used (e.g. "abc" -> 0)
+  const classic = ui.seedSource.value === "classic";
+  ui.mode.disabled = classic;             // the classic layout is fixed, so board type doesn't apply
+  const mode = classic ? "classic" : ui.mode.value;
   for (const draft of DRAFTS) {
-    const data = engine.newGame(draft, seed, ui.mode.value, draft);
+    const data = engine.newGame(draft, seed, mode, draft);
     board = data.board;
     states[draft] = data.state;
   }
-  ui.status.textContent = `Seed ${seed}, ${ui.mode.value} board. Press Next move or Autoplay.`;
+  const setup = classic ? "Catan: Classic Scenario (the seed places the desert)" : `${mode} board`;
+  ui.status.textContent = `Seed ${seed}, ${setup}. Press Next Move or Autoplay.`;
   render();
 }
 
@@ -97,6 +104,7 @@ async function init() {
   ui.restart.addEventListener("click", start);
   ui.newBoard.addEventListener("click", () => { ui.seed.value = randomSeed(); start(); });
   ui.mode.addEventListener("change", start);
+  ui.seedSource.addEventListener("change", start);
   ui.seed.addEventListener("change", start);
 
   try {

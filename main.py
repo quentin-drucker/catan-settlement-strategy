@@ -10,7 +10,8 @@ Commands:
 
 Options for play/explore:
     --seed N                     same seed -> same board and game (default: random, printed)
-    --board separated|random     separated (default) = no 6/8 next to another 6/8
+    --board separated|random|classic  separated (default) = no 6/8 next to another 6/8;
+                                 classic = rulebook lettered spiral, seed places the desert
     --draft snake|standard       snake (default) = A B C D D C B A
 """
 

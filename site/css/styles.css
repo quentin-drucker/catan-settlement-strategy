@@ -518,7 +518,7 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
 .data-table__row--key th { font-weight: 600; }
 
 /* Card grid: two columns side by side (one column on phones). Used for the
-   "In Summary" lists on the Introduction page. */
+   "In Summary" lists on the Introduction page and the Watch page's intro. */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -552,7 +552,8 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
 }
 
 /* Controls: a toolbar row of fields and buttons above a game (Watch/Play).
-   .field = a small label stacked over a select/input/checkbox. */
+   .field = a small label stacked over a select/input/checkbox.
+   .field__row = two inputs under one label (Watch: seed source + seed number). */
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -581,6 +582,11 @@ button.button { cursor: pointer; line-height: inherit; }   /* <button> needs the
   border-radius: var(--radius-card);
 }
 .field__input--short { min-width: 0; width: 7rem; }   /* numbers: seed */
+.field__input:disabled { opacity: 0.5; cursor: not-allowed; }
+.field__row {
+  display: flex;
+  gap: var(--space-2);
+}
 .field--check {                  /* checkbox + label on one line */
   flex-direction: row;
   align-items: center;

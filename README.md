@@ -51,7 +51,8 @@ python -m pip install -r requirements.txt
 Options for `play` / `explore`:
 - `--seed N`: the same seed always gives the same board and the same game. Leave it out for a
   random seed (printed at the top so the game can be replayed).
-- `--board separated|random`: `separated` (default) = no 6 or 8 next to another 6 or 8.
+- `--board separated|random|classic`: `separated` (default) = no 6 or 8 next to another 6 or 8.
+  `classic` = the rulebook layout (tokens A-R in a spiral, skipping the desert); the seed places the desert.
 - `--draft snake|standard`: `snake` is the default.
 - `python main.py --help` and `python main.py play --help` list everything.
 
