@@ -102,6 +102,8 @@ python main.py experiments --games 100000 --seed 0
 - 4 setups (snake / standard x separated / random boards), 100,000 games each, ~4 minutes.
 - Writes `results/summary.md`, 5 charts `results/*.png`, raw CSVs `results/raw/` (one row
   per player per game).
+- The raw CSVs from the 100,000-game run are included in `results/raw/`: one file per setup
+  (e.g. `separated_snake.csv`), 400,000 rows each, about 85 MB in total.
 - Note: this overwrites the committed `results/`. Add `--out <folder>` to write elsewhere
   and compare.
 - The same seeds give identical numbers. Expected fairness gap (best seat's average minus worst):

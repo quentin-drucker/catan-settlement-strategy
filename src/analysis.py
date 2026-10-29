@@ -352,7 +352,7 @@ def plot_heatmap(s: dict, path: Path) -> Path:
 def run_experiments(n_games: int, base_seed: int = 0, out_dir: str | Path = "results") -> dict:
     """Simulate all four setups, then write the report and charts to ``out_dir``.
 
-    - Raw CSVs -> ``out_dir/raw/<board>_<draft>.csv`` (large; git-ignored)
+    - Raw CSVs -> ``out_dir/raw/<board>_<draft>.csv`` (large: ~22 MB each at 100,000 games)
     - Report   -> ``out_dir/summary.md``
     - Charts   -> ``out_dir/*.png``
     """
