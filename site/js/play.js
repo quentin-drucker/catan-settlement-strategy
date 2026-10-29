@@ -2,11 +2,12 @@
 //
 // Key parts:
 //   newGame()   - start a game with the chosen seat, draft and board type
+//                 ("Catan: Classic Scenario" = rulebook token spiral; the seed only places the desert)
 //   runCpus()   - play CPU turns one by one with a short pause, until it's the human's turn
 //   pick(spot)  - the human's move (validated by the Python engine)
 //   render()    - board (open spots clickable on the human's turn), scores, log, status
 //
-// "generation" guards against an old CPU loop continuing after "New game" was pressed.
+// "generation" guards against an old CPU loop continuing after "New Game" was pressed.
 
 import { loadEngine, randomSeed } from "./engine.js";
 import { drawBoard, renderScores, describeMove, resultText } from "./board.js";
@@ -20,6 +21,7 @@ const ui = {
   seat: $("play-seat"),
   draft: $("play-draft"),
   mode: $("play-board"),
+  seedSource: $("play-seed-source"),
   seed: $("play-seed"),
   values: $("play-values"),
   newGame: $("play-new"),
@@ -46,8 +48,10 @@ function setStatus(text, kind = "") {
 // Start a game: the seed box is used if filled in, otherwise a random seed.
 function newGame() {
   generation += 1;
-  if (ui.seed.value === "") ui.seed.value = randomSeed();
-  settings = { seat: ui.seat.value, draft: ui.draft.value, mode: ui.mode.value, seed: Number(ui.seed.value) };
+  ui.seed.value = ui.seed.value.trim() === "" ? randomSeed() : Math.max(0, parseInt(ui.seed.value, 10) || 0);
+  const classic = ui.seedSource.value === "classic";
+  ui.mode.disabled = classic;             // the classic layout is fixed, so board type doesn't apply
+  settings = { seat: ui.seat.value, draft: ui.draft.value, mode: classic ? "classic" : ui.mode.value, seed: Number(ui.seed.value) };
   const data = engine.newGame(KEY, settings.seed, settings.mode, settings.draft, settings.seat);
   board = data.board;
   state = data.state;
@@ -124,7 +128,7 @@ function render() {
 async function init() {
   ui.newGame.addEventListener("click", () => { ui.seed.value = ""; newGame(); });
   ui.values.addEventListener("change", () => state && render());
-  for (const el of [ui.seat, ui.draft, ui.mode]) el.addEventListener("change", newGame);
+  for (const el of [ui.seat, ui.draft, ui.mode, ui.seedSource]) el.addEventListener("change", newGame);
   ui.seed.addEventListener("change", newGame);
 
   try {
