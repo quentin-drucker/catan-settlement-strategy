@@ -2,7 +2,9 @@
 <!--
   watch.html: watch two computer games side by side, snake vs standard, on the same board.
   Key parts:
-  - controls: seed, board type, Next move, Autoplay, Restart, New board
+  - intro beside "Things to Note" (how the controls work)
+  - controls: seed (own number or Catan: Classic Scenario), board type, Next Move,
+    Autoplay, Restart, New Board
   - status line (read out by screen readers as it changes)
   - two board panels, each with whose turn it is, a scoreboard and a move log
   The game runs in the browser: js/engine.js loads the Python engine (src/*.py)
@@ -12,7 +14,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Watch a game | Catan Settlement Strategy</title>
+  <title>Watch a Game | Catan Settlement Strategy</title>
   <meta name="description" content="Watch greedy computer players draft settlements on a Catan board, snake and standard order side by side.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/styles.css">
@@ -40,20 +42,42 @@
 
   <main id="main" class="page">
 
-    <!-- Intro: what's on this page. -->
-    <h1>Watch a game</h1>
-    <p class="lede">
-      Four greedy computer players draft on the same board twice: once in snake order, once in
-      standard order. Step through both games together and watch the same spots go to different players.
-    </p>
+    <!-- Intro: what's on this page, with how the controls work beside it. -->
+    <div class="card-grid wide">
+      <div>
+        <h1>Watch a Game</h1>
+        <p class="lede">
+          Watching a game lets you see the moves of four greedy CPU players as they draft the highest
+          value spots. Games played using a snake draft and a standard draft happen right next to each
+          other on their respective boards, and the scores are displayed under.
+        </p>
+      </div>
+      <div>
+        <h2>Things to Note</h2>
+        <ul>
+          <li>The seed can be changed by entering a completely new number in the field or by clicking the “New Board” button.</li>
+          <li>The “Board” dropdown toggles the board type between ‘separated’ and ‘true random’.</li>
+          <li>“Next Move” makes one step through the simulation for each click.</li>
+          <li>“Autoplay” progresses through the whole simulation with small pauses between each selection.</li>
+          <li>“Restart” clears the board of settlements but keeps the current seed.</li>
+        </ul>
+      </div>
+    </div>
     <div class="ornament" aria-hidden="true"><span class="ornament__hex"></span></div>
 
     <!-- Controls. Buttons start disabled and switch on once the engine has loaded. -->
     <div class="controls wide">
-      <label class="field">
-        <span class="field__label">Seed</span>
-        <input class="field__input field__input--short" id="watch-seed" type="number" min="0" step="1" value="42">
-      </label>
+      <div class="field" role="group" aria-labelledby="watch-seed-label">
+        <span class="field__label" id="watch-seed-label">Seed</span>
+        <div class="field__row">
+          <select class="field__input" id="watch-seed-source" aria-label="Seed source">
+            <option value="own" selected>Enter your own</option>
+            <option value="classic">Catan: Classic Scenario</option>
+          </select>
+          <input class="field__input field__input--short" id="watch-seed" type="text" inputmode="numeric"
+                 pattern="[0-9]*" value="42" aria-label="Seed number">
+        </div>
+      </div>
       <label class="field">
         <span class="field__label">Board</span>
         <select class="field__input" id="watch-board">
@@ -61,10 +85,10 @@
           <option value="random">Random</option>
         </select>
       </label>
-      <button class="button button--primary" id="watch-next" type="button" disabled data-needs-engine>Next move</button>
+      <button class="button button--primary" id="watch-next" type="button" disabled data-needs-engine>Next Move</button>
       <button class="button button--secondary" id="watch-auto" type="button" aria-pressed="false" disabled data-needs-engine>Autoplay</button>
       <button class="button button--secondary" id="watch-restart" type="button" disabled data-needs-engine>Restart</button>
-      <button class="button button--secondary" id="watch-new" type="button" disabled data-needs-engine>New board</button>
+      <button class="button button--secondary" id="watch-new" type="button" disabled data-needs-engine>New Board</button>
     </div>
 
     <!-- Status: loading message, then a sentence per move. aria-live = read out when it changes. -->
@@ -99,16 +123,6 @@
         <ol class="move-log" id="log-standard"></ol>
       </section>
     </div>
-
-    <!-- How to read the boards. -->
-    <h2>What to look for</h2>
-    <ul>
-      <li>Every turn, both games take the same spot. Greedy players only look at the board, never at who is picking.</li>
-      <li>Turns 1 to 4 are identical. From turn 5 the orders split: snake gives D two picks in a row, standard goes back to A.</li>
-      <li>Under standard, A collects the best first pick and the best leftover. Under snake, the leftovers flow back towards D.</li>
-      <li>Houses are settlements (letter = player). Grey dots are blocked spots, next to a settlement. The gold ring marks the newest move.</li>
-    </ul>
-    <p>Replay the same game in the terminal with <code>python main.py play --seed 42 --draft snake</code>.</p>
   </main>
 
   <!-- Footer (same on every page). -->
