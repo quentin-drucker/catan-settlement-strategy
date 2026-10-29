@@ -10,7 +10,7 @@
 // "generation" guards against an old CPU loop continuing after "New Game" was pressed.
 
 import { loadEngine, randomSeed } from "./engine.js";
-import { drawBoard, renderScores, describeMove, resultText } from "./board.js";
+import { drawBoard, renderScores, describeMove, resultText, playerChip, playerColor } from "./board.js";
 
 const KEY = "play";
 const CPU_PAUSE_MS = 700;   // pause before each CPU move so it can be followed
@@ -40,9 +40,12 @@ let busy = false;         // true while CPUs are moving (clicks ignored)
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function setStatus(text, kind = "") {
+// `player` (optional): starts the line with that seat's chip and colors its edge.
+function setStatus(text, kind = "", player = null) {
   ui.status.textContent = text;
+  if (player) ui.status.insertAdjacentHTML("afterbegin", `${playerChip(player, true)} `);
   ui.status.className = `status wide${kind ? ` status--${kind}` : ""}`;
+  ui.status.style.setProperty("--player", player ? playerColor(player) : "");
 }
 
 // Start a game: the seed box is used if filled in, otherwise a random seed.
@@ -64,7 +67,7 @@ async function runCpus(gen) {
   busy = true;
   render();
   while (!state.is_over && !state.current_is_human) {
-    setStatus(`Player ${state.current} (computer) is choosing...`);
+    setStatus(`Player ${state.current} (computer) is choosing...`, "", state.current);
     await sleep(CPU_PAUSE_MS);
     if (gen !== generation) return;           // a new game started meanwhile
     state = engine.step(KEY).state;
@@ -74,7 +77,7 @@ async function runCpus(gen) {
   if (state.is_over) {
     finish();
   } else {
-    setStatus(`Your turn (player ${settings.seat}): pick one of the gold-ringed spots.`, "turn");
+    setStatus(`Your turn (player ${settings.seat}): pick one of the gold-ringed spots.`, "turn", settings.seat);
   }
   render();
 }
@@ -114,13 +117,13 @@ function render() {
     label: humanTurn ? "Board: pick an open spot" : "Board",
   });
   renderScores(ui.scores, state, board);
-  ui.turn.textContent = state.is_over
+  ui.turn.innerHTML = state.is_over
     ? `Seed ${settings.seed}, ${settings.draft} draft, ${settings.mode} board. Game over.`
-    : `Seed ${settings.seed}, ${settings.draft} draft. Turn ${state.moves.length + 1} of 8: player ${state.current}`
-      + (state.current_is_human ? " (you)" : "");
+    : `Seed ${settings.seed}, ${settings.draft} draft. Turn ${state.moves.length + 1} of 8: `
+      + `${playerChip(state.current, true)} ${state.current_is_human ? "you pick" : "picks"} next`;
   ui.log.replaceChildren(...state.moves.map((m) => {
     const li = document.createElement("li");
-    li.textContent = describeMove(m) + (m.player === settings.seat ? " (you)" : "");
+    li.innerHTML = describeMove(m) + (m.player === settings.seat ? " (you)" : "");
     return li;
   }));
 }
